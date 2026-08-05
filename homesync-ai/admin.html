@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin — HomeSync AI</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/png" href="assets/favicon-64.png" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div>
+    <div class="nav-links">
+      <a href="dashboard.html">Matches</a>
+      <a href="profile.html">My account</a>
+      <div id="notif-bell-slot"></div>
+      <a href="#" id="logout-btn" class="btn btn-ghost">Sign out</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Shown only if the signed-in user is NOT an admin -->
+<div id="admin-guard" class="wrap admin-guard-msg hidden">
+  <span class="eyebrow">Restricted</span>
+  <h2>This page is for admins only.</h2>
+  <p>If you think you should have access, ask an existing admin to run the promote command in <code>sql/schema.sql</code>.</p>
+  <a href="dashboard.html" class="btn btn-primary">Back to dashboard</a>
+</div>
+
+<!-- Real content — hidden until we've confirmed the user is an admin -->
+<section id="admin-content" class="wrap section-tight hidden">
+  <span class="eyebrow">Admin</span>
+  <h2>Team dashboard</h2>
+  <p style="margin-bottom:28px;">User management, account status, and announcements. Visible only to the 4 admin accounts.</p>
+
+  <div id="admin-msg" class="msg hidden"></div>
+
+  <div class="stat-grid">
+    <div class="card stat-card"><div class="stat-num" id="stat-total">–</div><div class="stat-label">Total users</div></div>
+    <div class="card stat-card"><div class="stat-num" id="stat-week">–</div><div class="stat-label">Joined this week</div></div>
+    <div class="card stat-card"><div class="stat-num" id="stat-suspended">–</div><div class="stat-label">Suspended</div></div>
+    <div class="card stat-card"><div class="stat-num" id="stat-admins">–</div><div class="stat-label">Admins</div></div>
+  </div>
+
+  <div class="card account-section" style="margin-bottom:24px;">
+    <h3>Send an announcement</h3>
+    <p class="muted">Delivered as an in-app notification to every user.</p>
+    <label for="broadcast-title">Title</label>
+    <input type="text" id="broadcast-title" placeholder="e.g. New feature: LLM bio matching" />
+    <label for="broadcast-body">Message (optional)</label>
+    <textarea id="broadcast-body" placeholder="A sentence or two…"></textarea>
+    <button id="broadcast-btn" class="btn btn-primary">Send to all users</button>
+  </div>
+
+  <div class="card account-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+      <h3 style="margin-bottom:0;">Users</h3>
+      <input type="text" id="user-search" placeholder="Search name, email, city…" style="max-width:260px; margin-bottom:0;" />
+    </div>
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>City</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="user-table-body">
+          <tr><td colspan="6" class="muted center" style="padding:24px;">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

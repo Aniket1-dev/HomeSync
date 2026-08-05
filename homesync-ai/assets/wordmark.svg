@@ -1,0 +1,28 @@
+<svg width="900" height="220" viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="arcA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7A2E4A"/>
+      <stop offset="100%" stop-color="#5E2038"/>
+    </linearGradient>
+    <linearGradient id="arcB" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#C9973B"/>
+      <stop offset="100%" stop-color="#55764F"/>
+    </linearGradient>
+    <style>
+      .word { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; fill: #1C1B1F; }
+      .sub { font-family: 'Courier New', monospace; fill: #7A2E4A; letter-spacing: 3px; }
+    </style>
+  </defs>
+
+  <g transform="translate(20,10) scale(0.35)">
+    <circle cx="216" cy="256" r="110" fill="none" stroke="url(#arcA)" stroke-width="34" stroke-linecap="round"
+      stroke-dasharray="560 700" transform="rotate(-40 216 256)"/>
+    <circle cx="296" cy="256" r="110" fill="none" stroke="url(#arcB)" stroke-width="34" stroke-linecap="round"
+      stroke-dasharray="560 700" transform="rotate(140 296 256)"/>
+    <circle cx="256" cy="256" r="20" fill="#1C1B1F"/>
+  </g>
+
+  <text x="240" y="128" class="word" font-size="76">HomeSync</text>
+  <text x="700" y="128" class="word" font-size="76" fill="#7A2E4A" font-style="italic">AI</text>
+  <text x="242" y="168" class="sub" font-size="20">ROOMMATE COMPATIBILITY</text>
+</svg>

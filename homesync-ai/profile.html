@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My account — HomeSync AI</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/png" href="assets/favicon-64.png" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div>
+    <div class="nav-links">
+      <a href="dashboard.html">Matches</a>
+      <a href="admin.html" id="admin-link" class="hidden">Admin</a>
+      <div id="notif-bell-slot"></div>
+      <a href="#" id="logout-btn-top" class="btn btn-ghost">Sign out</a>
+    </div>
+  </div>
+</nav>
+
+<section class="wrap section-tight">
+  <span class="eyebrow">Account</span>
+  <h2 style="margin-bottom:24px;">My account</h2>
+
+  <div id="account-msg" class="msg hidden"></div>
+
+  <div class="account-shell">
+    <!-- Left nav -->
+    <div class="account-nav">
+      <a href="#profile" class="active">Profile</a>
+      <a href="#notifications">Notifications</a>
+      <a href="#security">Security</a>
+      <a href="#support">Support</a>
+      <a href="#legal">Legal</a>
+      <a href="#app">App</a>
+      <a href="#account-actions">Account actions</a>
+    </div>
+
+    <!-- Right content -->
+    <div>
+
+      <!-- Profile -->
+      <div class="card account-section" id="profile">
+        <h3>Profile</h3>
+        <p class="muted">Shown to people you match with.</p>
+
+        <div class="avatar-row">
+          <div class="avatar-lg" id="profile-avatar">?</div>
+          <div style="flex:1;">
+            <label for="profile-avatar-input" style="margin-bottom:4px;">Profile photo</label>
+            <input type="file" id="profile-avatar-input" accept="image/*" />
+            <p class="field-hint" id="profile-avatar-hint" style="margin-bottom:0;">Required. JPG/PNG, under 5MB.</p>
+          </div>
+        </div>
+
+        <label for="profile-full-name">Full name</label>
+        <input type="text" id="profile-full-name" />
+
+        <label for="profile-email">Email address</label>
+        <input type="email" id="profile-email" disabled />
+        <p class="field-hint">Your login email — change it under Security.</p>
+
+        <label for="profile-mobile">Mobile number</label>
+        <input type="tel" id="profile-mobile" placeholder="e.g. 9876543210" />
+        <p class="field-hint">Shown to matches so they can reach you on WhatsApp.</p>
+
+        <label for="profile-dob">Date of birth (optional)</label>
+        <input type="date" id="profile-dob" />
+
+        <button id="save-profile-basics-btn" class="btn btn-primary">Save changes</button>
+      </div>
+
+      <!-- Notifications -->
+      <div class="card account-section" id="notifications">
+        <h3>Notifications</h3>
+        <p class="muted">Choose what HomeSync AI can notify you about.</p>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-row-label">New match alerts</div>
+            <div class="toggle-row-hint">Get notified when a strong new compatibility match appears.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="notif-match-alerts" />
+            <span class="switch-track"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-row-label">Email updates</div>
+            <div class="toggle-row-hint">Product updates and occasional emails from the team.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="notif-email-updates" />
+            <span class="switch-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Security -->
+      <div class="card account-section" id="security">
+        <h3>Security</h3>
+        <p class="muted">Manage how you sign in.</p>
+
+        <label for="new-password">New password</label>
+        <input type="password" id="new-password" placeholder="At least 8 characters" minlength="8" />
+        <button id="change-password-btn" class="btn btn-ghost" style="margin-bottom:8px;">Update password</button>
+        <p class="field-hint" style="margin-top:8px;">Leave blank if you don't want to change it.</p>
+
+        <hr class="divider" style="margin:20px 0;" />
+        <button id="logout-all-btn" class="btn btn-ghost">Sign out of all devices</button>
+      </div>
+
+      <!-- Support -->
+      <div class="card account-section" id="support">
+        <h3>Support</h3>
+        <p class="muted">We're a small student team — reach out any time.</p>
+        <div class="link-list">
+          <a href="mailto:support@homesync.ai">Contact us <span>→</span></a>
+          <a href="#faq">FAQs <span>→</span></a>
+        </div>
+      </div>
+
+      <!-- Legal -->
+      <div class="card account-section" id="legal">
+        <h3>Legal</h3>
+        <div class="link-list">
+          <a href="#" id="privacy-link">Privacy Policy <span>→</span></a>
+          <a href="#" id="terms-link">Terms &amp; Conditions <span>→</span></a>
+          <a href="#" id="disclaimer-link">Disclaimer <span>→</span></a>
+        </div>
+      </div>
+
+      <!-- App -->
+      <div class="card account-section" id="app">
+        <h3>App</h3>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-row-label">Dark mode</div>
+            <div class="toggle-row-hint">Easier on the eyes at night.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <span class="switch-track"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-row-label">App version</div>
+          <div class="toggle-row-hint">B.Tech Project-II prototype · v0.1</div>
+        </div>
+      </div>
+
+      <!-- Account actions -->
+      <div class="card account-section danger-zone" id="account-actions">
+        <h3>Account actions</h3>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
+          <button id="logout-btn-bottom" class="btn btn-ghost">Log out</button>
+          <button id="delete-account-btn" class="btn btn-danger">Delete account</button>
+        </div>
+        <p class="field-hint" style="margin-top:12px;">
+          Deleting your account removes your profile and matches permanently. This can't be undone.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>© 2026 HomeSync AI — B.Tech Project-II prototype</span>
+    <span>Aniket · Anchal Garg · Anant Saxena · Ayush Chauhan</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/avatarUpload.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>
