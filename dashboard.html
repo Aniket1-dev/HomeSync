@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your matches — HomeSync AI</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/png" href="assets/favicon-64.png" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div>
+    <div class="nav-links">
+      <a href="#" id="edit-profile-link">Edit lifestyle profile</a>
+      <a href="profile.html">My account</a>
+      <a href="admin.html" id="admin-link" class="hidden">Admin</a>
+      <div id="notif-bell-slot"></div>
+      <a href="#" id="logout-btn" class="btn btn-ghost">Sign out</a>
+    </div>
+  </div>
+</nav>
+
+<section class="wrap section-tight">
+  <span class="eyebrow">Your matches</span>
+  <h2>Welcome back, <span id="welcome-name">there</span>.</h2>
+  <p style="margin-bottom:28px;">Ranked by structured compatibility — sleep, cleanliness, budget, and more. Matching within your city for now.</p>
+
+  <div id="match-list"></div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/matching.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
