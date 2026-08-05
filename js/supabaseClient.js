@@ -8,7 +8,7 @@
 // ============================================================
 
 const SUPABASE_URL = "https://xbqmrmxneizmjuafunvq.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_APx8RaZ3zFB_ZZ0ksVV_oQ_IJ0mlvq9";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhicW1ybXhuZWl6bWp1YWZ1bnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5MjAyMjksImV4cCI6MjEwMTQ5NjIyOX0.fd7GyIZzAxzJnz8kGXvNfA9gIAuQ5nHigRvQUcXc7Ts";
 
 // Loaded from CDN in every HTML page via:
 // <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
