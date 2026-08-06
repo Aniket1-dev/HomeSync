@@ -9,6 +9,7 @@
 :root {
   /* Color tokens — dark navy + emerald, matched to ZeroSmoke.in */
   --canvas: #0B0F17;
+  --canvas-rgb: 11, 15, 23;
   --canvas-raised: #131A26;
   --ink: #F3F5F7;
   --ink-soft: #94A3B8;
@@ -41,6 +42,7 @@
 /* Optional light variant — toggled at runtime via js/theme.js */
 body.light {
   --canvas: #F4F1E8;
+  --canvas-rgb: 244, 241, 232;
   --canvas-raised: #FFFFFF;
   --ink: #1C1B1F;
   --ink-soft: #5B5750;
@@ -126,7 +128,7 @@ a:hover { text-decoration: underline; }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(11,15,23,0.86);
+  background: rgba(var(--canvas-rgb), 0.86);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
