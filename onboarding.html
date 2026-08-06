@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Set up your profile — HomeSync AI</title>
+<meta name="robots" content="noindex, follow" />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/png" href="assets/favicon-64.png" />
+</head>
+<body>
+<script>(function(){try{if(localStorage.getItem('homesync-theme')==='light'){document.body.classList.add('light');}}catch(e){}})();</script>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div>
+    <div class="nav-links">
+      <button id="theme-toggle" class="theme-toggle" type="button" title="Toggle theme" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+      <a href="#" id="logout-btn" class="btn btn-ghost">Sign out</a>
+    </div>
+  </div>
+</nav>
+
+<section class="wrap section" style="padding-top:48px;">
+  <div class="wizard-shell">
+
+    <div class="wizard-head">
+      <span class="eyebrow">Build your compatibility profile</span>
+      <h2>Tell us how you actually live</h2>
+      <p style="max-width:52ch; margin:0 auto;">This powers your compatibility score — the more honest, the better your matches.</p>
+    </div>
+
+    <div class="wizard-step-track" id="wizard-step-track">
+      <div class="wizard-step active" data-step="1"><span class="wizard-step-num">1</span><span class="wizard-step-label">Basics</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="2"><span class="wizard-step-num">2</span><span class="wizard-step-label">Location &amp; budget</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="3"><span class="wizard-step-num">3</span><span class="wizard-step-label">Lifestyle</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="4"><span class="wizard-step-num">4</span><span class="wizard-step-label">About you</span></div>
+    </div>
+
+    <div id="onboarding-msg" class="msg hidden"></div>
+
+    <form id="onboarding-form">
+      <div class="card wizard-card">
+
+        <!-- Step 1: Basics -->
+        <div class="wizard-panel active" data-panel="1">
+          <div class="wizard-panel-icon">👤</div>
+          <h3>The basics</h3>
+          <p class="muted" style="margin-bottom:22px;">Nothing here is public except your name and city.</p>
+
+          <label for="full_name">Full name</label>
+          <input type="text" name="full_name" id="full_name" required />
+
+          <div class="grid-2">
+            <div>
+              <label for="age">Age</label>
+              <input type="number" name="age" id="age" min="17" max="80" />
+            </div>
+            <div>
+              <label for="gender">Gender</label>
+              <select name="gender" id="gender">
+                <option value="">Prefer not to say</option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label for="mobile_number">Mobile number</label>
+              <input type="tel" name="mobile_number" id="mobile_number" placeholder="e.g. 9876543210" />
+            </div>
+            <div>
+              <label for="date_of_birth">Date of birth (optional)</label>
+              <input type="date" name="date_of_birth" id="date_of_birth" />
+            </div>
+          </div>
+          <p class="field-hint">Your mobile number is only shown to people you match with, so they can reach you on WhatsApp.</p>
+
+          <div class="wizard-nav">
+            <span></span>
+            <button type="button" class="btn btn-primary wizard-next" data-next="2">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Location & budget -->
+        <div class="wizard-panel" data-panel="2">
+          <div class="wizard-panel-icon">📍</div>
+          <h3>Location &amp; budget</h3>
+          <p class="muted" style="margin-bottom:22px;">We match you within your city first — this keeps matches realistic.</p>
+
+          <div class="grid-2">
+            <div>
+              <label for="city">City</label>
+              <input type="text" name="city" id="city" placeholder="e.g. Meerut" required />
+            </div>
+            <div>
+              <label for="preferred_area">Preferred area / commute</label>
+              <input type="text" name="preferred_area" id="preferred_area" placeholder="e.g. near campus, Sector 12" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label for="budget_min">Rent budget — min (₹/month)</label>
+              <input type="number" name="budget_min" id="budget_min" min="0" required />
+            </div>
+            <div>
+              <label for="budget_max">Rent budget — max (₹/month)</label>
+              <input type="number" name="budget_max" id="budget_max" min="0" required />
+            </div>
+          </div>
+
+          <div class="wizard-nav">
+            <button type="button" class="btn btn-ghost wizard-back" data-back="1">← Back</button>
+            <button type="button" class="btn btn-primary wizard-next" data-next="3">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Lifestyle -->
+        <div class="wizard-panel" data-panel="3">
+          <div class="wizard-panel-icon">🌙</div>
+          <h3>Lifestyle</h3>
+          <p class="muted" style="margin-bottom:22px;">This is the heart of your compatibility score.</p>
+
+          <label for="sleep_schedule">Sleep schedule — early riser ↔ night owl</label>
+          <div class="range-row">
+            <input type="range" name="sleep_schedule" id="sleep_schedule" min="1" max="5" value="3" />
+            <span class="range-val" id="sleep_schedule-val">3</span>
+          </div>
+
+          <label for="cleanliness">Cleanliness — relaxed ↔ very tidy</label>
+          <div class="range-row">
+            <input type="range" name="cleanliness" id="cleanliness" min="1" max="5" value="3" />
+            <span class="range-val" id="cleanliness-val">3</span>
+          </div>
+
+          <label for="guest_frequency">Guest frequency — rarely ↔ often</label>
+          <div class="range-row">
+            <input type="range" name="guest_frequency" id="guest_frequency" min="1" max="5" value="3" />
+            <span class="range-val" id="guest_frequency-val">3</span>
+          </div>
+
+          <label for="personality">Personality — introvert ↔ extrovert</label>
+          <div class="range-row">
+            <input type="range" name="personality" id="personality" min="1" max="5" value="3" />
+            <span class="range-val" id="personality-val">3</span>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label for="smoking_drinking">Smoking / drinking</label>
+              <select name="smoking_drinking" id="smoking_drinking">
+                <option value="never">Never</option>
+                <option value="social">Socially</option>
+                <option value="regular">Regularly</option>
+              </select>
+            </div>
+            <div>
+              <label for="cooking_habits">Cooking habits</label>
+              <select name="cooking_habits" id="cooking_habits">
+                <option value="self_cook">Self-cook</option>
+                <option value="order_in">Order-in</option>
+                <option value="shared">Shared cooking</option>
+              </select>
+            </div>
+          </div>
+
+          <label for="conflict_style">When there's a disagreement, I usually…</label>
+          <select name="conflict_style" id="conflict_style">
+            <option value="avoids">Avoid bringing it up</option>
+            <option value="discusses">Talk it through calmly</option>
+            <option value="confronts">Address it directly, right away</option>
+          </select>
+
+          <div class="wizard-nav">
+            <button type="button" class="btn btn-ghost wizard-back" data-back="2">← Back</button>
+            <button type="button" class="btn btn-primary wizard-next" data-next="4">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 4: About you -->
+        <div class="wizard-panel" data-panel="4">
+          <div class="wizard-panel-icon">✍️</div>
+          <h3>About you</h3>
+          <p class="muted" style="margin-bottom:22px;">Read by our AI model to catch nuance a form can't — like odd hours or specific needs.</p>
+
+          <label for="bio">Bio — what you're like, and what you're looking for (50–150 words)</label>
+          <textarea name="bio" id="bio" required placeholder="e.g. I work night shifts as a nurse and need daytime quiet. Fairly tidy, don't smoke, enjoy a quiet weekend more than parties. Looking for someone respectful of shared space who communicates directly if something's off."></textarea>
+
+          <div class="wizard-nav">
+            <button type="button" class="btn btn-ghost wizard-back" data-back="3">← Back</button>
+            <button type="submit" id="save-profile-btn" class="btn btn-primary">Save &amp; see matches ✓</button>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/onboarding.js"></script>
+</body>
+</html>
