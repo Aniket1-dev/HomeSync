@@ -1,5 +1,5 @@
-// Auth flows: Google OAuth + Email/Password Sign in & Sign up
-// Requires: supabaseClient.js loaded first
+// Auth flows: Google OAuth + Email/Password
+// Requires supabaseClient.js
 
 const els = {
   tabSignin: document.getElementById("tab-signin"),
@@ -26,11 +26,30 @@ const els = {
   msg: document.getElementById("auth-msg"),
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  // If already logged in, skip straight to app
-  supabaseClient.auth.getSession().then(({ data }) => {
-    if (data.session) redirectAfterLogin();
-  });
+// ---------- APP URL HELPER ----------
+
+function appUrl(page = "") {
+  const host = window.location.hostname;
+
+  // GitHub Pages
+  if (host === "aniket1-dev.github.io") {
+    return `https://aniket1-dev.github.io/HomeSync/${page}`;
+  }
+
+  // Netlify / Vercel / Localhost
+  return `${window.location.origin}/${page}`;
+}
+
+// ---------- INIT ----------
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+  const { data } = await supabaseClient.auth.getSession();
+
+  if (data.session) {
+    redirectAfterLogin();
+    return;
+  }
 
   els.tabSignin?.addEventListener("click", () => showStep("signin"));
   els.tabSignup?.addEventListener("click", () => showStep("signup"));
@@ -42,155 +61,184 @@ document.addEventListener("DOMContentLoaded", () => {
   els.googleBtn?.addEventListener("click", handleGoogleSignIn);
 });
 
+// ---------- UI ----------
+
 function showStep(step) {
+
   hideMsg(els.msg);
+
   els.signinStep.classList.toggle("hidden", step !== "signin");
   els.signupStep.classList.toggle("hidden", step !== "signup");
   els.confirmStep.classList.toggle("hidden", step !== "confirm");
+
   els.tabSignin.classList.toggle("active", step === "signin");
   els.tabSignup.classList.toggle("active", step === "signup");
+
 }
+
+// ---------- GOOGLE ----------
 
 async function handleGoogleSignIn() {
+
   hideMsg(els.msg);
+
   const { error } = await supabaseClient.auth.signInWithOAuth({
+
     provider: "google",
-    options: { redirectTo: window.location.origin + "/login.html" },
+
+    options: {
+
+      redirectTo: appUrl("login.html")
+
+    }
+
   });
+
   if (error) showMsg(els.msg, error.message);
+
 }
 
+// ---------- SIGN IN ----------
+
 async function handleSignIn(e) {
+
   e.preventDefault();
+
   const email = els.signinEmail.value.trim();
   const password = els.signinPassword.value;
 
-  if (!/^\S+@\S+\.\S+$/.test(email)) {
-    showMsg(els.msg, "Enter a valid email address.");
-    return;
-  }
-  if (!password) {
-    showMsg(els.msg, "Enter your password.");
-    return;
-  }
+  const { data, error } =
+    await supabaseClient.auth.signInWithPassword({
 
-  hideMsg(els.msg);
-  setLoading(els.signinBtn, true, "Sign in");
+      email,
+      password
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  setLoading(els.signinBtn, false, "Sign in");
+    });
 
   if (error) {
-    // Supabase returns this exact message when the account exists but
-    // hasn't clicked the confirmation link yet.
-    if (/email not confirmed/i.test(error.message)) {
-      showMsg(
-        els.msg,
-        "Please confirm your email first — check the link we sent you when you signed up."
-      );
-    } else if (/invalid login credentials/i.test(error.message)) {
-      showMsg(els.msg, "Incorrect email or password.");
-    } else {
-      showMsg(els.msg, error.message);
-    }
+
+    showMsg(els.msg, error.message);
     return;
+
   }
 
-  if (data.session) redirectAfterLogin();
+  if (data.session) {
+
+    redirectAfterLogin();
+
+  }
+
 }
 
+// ---------- SIGN UP ----------
+
 async function handleSignUp(e) {
+
   e.preventDefault();
+
   const name = els.signupName.value.trim();
   const email = els.signupEmail.value.trim();
   const password = els.signupPassword.value;
 
-  if (!name) {
-    showMsg(els.msg, "Enter your full name.");
-    return;
-  }
-  if (!/^\S+@\S+\.\S+$/.test(email)) {
-    showMsg(els.msg, "Enter a valid email address.");
-    return;
-  }
-  if (password.length < 8) {
-    showMsg(els.msg, "Password must be at least 8 characters.");
-    return;
-  }
+  const { data, error } =
+    await supabaseClient.auth.signUp({
 
-  hideMsg(els.msg);
-  setLoading(els.signupBtn, true, "Create account");
+      email,
+      password,
 
-  const { data, error } = await supabaseClient.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: name },
-      emailRedirectTo: window.location.origin + "/index.html",
-    },
-  });
+      options: {
 
-  setLoading(els.signupBtn, false, "Create account");
+        data: {
+
+          full_name: name
+
+        },
+
+        emailRedirectTo: appUrl("index.html")
+
+      }
+
+    });
 
   if (error) {
-    if (/already registered|already exists/i.test(error.message)) {
-      showMsg(els.msg, "An account with this email already exists. Try signing in instead.");
-    } else {
-      showMsg(els.msg, error.message);
-    }
-    return;
-  }
 
-  // If email confirmations are disabled in Supabase, a session comes back
-  // immediately and we can log the user straight in.
-  if (data.session) {
-    redirectAfterLogin();
-    return;
-  }
-
-  // Otherwise Supabase sent a confirmation email — show that state.
-  els.confirmEmailLabel.textContent = email;
-  showStep("confirm");
-}
-
-async function handleForgotPassword(e) {
-  e.preventDefault();
-  const email = els.signinEmail.value.trim();
-  if (!/^\S+@\S+\.\S+$/.test(email)) {
-    showMsg(els.msg, "Enter your email address above first, then click 'Forgot password?'.");
-    return;
-  }
-
-  hideMsg(els.msg);
-  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + "/index.html",
-  });
-
-  if (error) {
     showMsg(els.msg, error.message);
     return;
+
   }
-  showMsg(els.msg, "Password reset link sent — check your inbox.", "ok");
+
+  if (data.session) {
+
+    redirectAfterLogin();
+    return;
+
+  }
+
+  els.confirmEmailLabel.textContent = email;
+
+  showStep("confirm");
+
 }
 
-async function redirectAfterLogin() {
-  const {
-    data: { user },
-  } = await supabaseClient.auth.getUser();
-  const { data: profile } = await supabaseClient
-    .from("profiles")
-    .select("id, is_admin")
-    .eq("id", user.id)
-    .maybeSingle();
+// ---------- PASSWORD RESET ----------
 
-  if (profile?.is_admin) {
-    window.location.href = "admin.html";
-    return;
+async function handleForgotPassword(e) {
+
+  e.preventDefault();
+
+  const email = els.signinEmail.value.trim();
+
+  const { error } =
+    await supabaseClient.auth.resetPasswordForEmail(email, {
+
+      redirectTo: appUrl("index.html")
+
+    });
+
+  if (error) {
+
+    showMsg(els.msg, error.message);
+
+  } else {
+
+    showMsg(els.msg, "Password reset email sent.", "ok");
+
   }
 
-  window.location.href = profile ? "dashboard.html" : "onboarding.html";
+}
+
+// ---------- REDIRECT ----------
+
+async function redirectAfterLogin() {
+
+  const {
+
+    data: { user },
+
+  } = await supabaseClient.auth.getUser();
+
+  const { data: profile } =
+    await supabaseClient
+      .from("profiles")
+      .select("id,is_admin")
+      .eq("id", user.id)
+      .maybeSingle();
+
+  if (profile?.is_admin) {
+
+    window.location.href = appUrl("admin.html");
+    return;
+
+  }
+
+  if (profile) {
+
+    window.location.href = appUrl("dashboard.html");
+
+  } else {
+
+    window.location.href = appUrl("onboarding.html");
+
+  }
+
 }
