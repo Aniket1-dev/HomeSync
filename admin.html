@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Portal — HomeSync AI</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/png" href="assets/favicon-64.png" />
+</head>
+<body>
+<script>(function(){try{if(localStorage.getItem('homesync-theme')==='light'){document.body.classList.add('light');}}catch(e){}})();</script>
+
+<!-- Shown briefly / on failed auth check -->
+<div id="access-denied" class="access-denied hidden">
+  <div class="error-code">403</div>
+  <h2>Admins only</h2>
+  <p class="muted" style="max-width:40ch;">This area is restricted to HomeSync AI admin accounts.</p>
+  <a href="admin-login.html" class="btn btn-primary">Go to admin sign in</a>
+</div>
+
+<div id="admin-app" class="admin-shell hidden">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" />
+      HomeSync AI <span class="pill">Admin</span>
+    </div>
+
+    <a href="#overview" class="admin-nav-link active" data-panel-link="overview">📊 Overview</a>
+    <a href="#users" class="admin-nav-link" data-panel-link="users">👥 Users</a>
+    <a href="#messages" class="admin-nav-link" data-panel-link="messages">✉️ Contact messages</a>
+    <a href="#broadcasts" class="admin-nav-link" data-panel-link="broadcasts">📣 Broadcasts</a>
+    <a href="#settings" class="admin-nav-link" data-panel-link="settings">⚙️ Settings</a>
+
+    <div class="admin-sidebar-footer">
+      <a href="dashboard.html" class="admin-nav-link">← Back to app</a>
+      <a href="#" id="admin-logout-btn" class="admin-nav-link">🚪 Sign out</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+
+    <div class="admin-topbar">
+      <div>
+        <h2 style="margin-bottom:2px;">Welcome, <span id="admin-name">Admin</span></h2>
+        <p class="muted" style="margin:0;">Here's what's happening on HomeSync AI today.</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <div class="admin-search">
+          <span class="admin-search-icon">🔎</span>
+          <input type="text" id="admin-user-search" placeholder="Search users by name, email, or city…" />
+        </div>
+        <button id="theme-toggle" class="theme-toggle" type="button" title="Toggle theme" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="admin-stat-row">
+      <div class="card stat-card">
+        <div class="stat-card-top"><span class="stat-card-icon">👥</span></div>
+        <div class="stat-card-val" id="admin-stat-users">—</div>
+        <div class="stat-card-label">Total users</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-card-top"><span class="stat-card-icon">🏙️</span></div>
+        <div class="stat-card-val" id="admin-stat-cities">—</div>
+        <div class="stat-card-label">Cities covered</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-card-top"><span class="stat-card-icon">🆕</span></div>
+        <div class="stat-card-val" id="admin-stat-new">—</div>
+        <div class="stat-card-label">New this week</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-card-top"><span class="stat-card-icon">✉️</span></div>
+        <div class="stat-card-val" id="admin-stat-messages">—</div>
+        <div class="stat-card-label">Unread contact messages</div>
+      </div>
+    </div>
+
+    <!-- Overview panel -->
+    <div class="admin-panel active" data-panel="overview">
+      <div class="section-heading-row">
+        <h3 style="margin:0;">Recently joined</h3>
+      </div>
+      <div class="admin-table-wrap" style="margin-bottom:32px;">
+        <table class="admin-table">
+          <thead>
+            <tr><th>User</th><th>City</th><th>Budget</th><th>Joined</th><th>Status</th></tr>
+          </thead>
+          <tbody id="admin-recent-users-body">
+            <tr><td colspan="5" class="muted center">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-heading-row">
+        <h3 style="margin:0;">Latest contact messages</h3>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr><th>From</th><th>Topic</th><th>Message</th><th>Received</th></tr>
+          </thead>
+          <tbody id="admin-recent-messages-body">
+            <tr><td colspan="4" class="muted center">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Users panel -->
+    <div class="admin-panel" data-panel="users">
+      <div class="section-heading-row">
+        <h3 style="margin:0;">All users</h3>
+        <div class="filter-chip-row">
+          <button class="filter-chip active" data-status-filter="all">All</button>
+          <button class="filter-chip" data-status-filter="active">Active</button>
+          <button class="filter-chip" data-status-filter="suspended">Suspended</button>
+          <button class="filter-chip" data-status-filter="admin">Admins</button>
+        </div>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr><th>User</th><th>City</th><th>Budget</th><th>Joined</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody id="admin-users-body">
+            <tr><td colspan="6" class="muted center">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Messages panel -->
+    <div class="admin-panel" data-panel="messages">
+      <div class="section-heading-row">
+        <h3 style="margin:0;">Contact form submissions</h3>
+        <div class="filter-chip-row">
+          <button class="filter-chip active" data-msg-filter="all">All</button>
+          <button class="filter-chip" data-msg-filter="unread">Unread</button>
+        </div>
+      </div>
+      <div class="admin-search" style="max-width:360px; margin-bottom:16px;">
+        <span class="admin-search-icon">🔎</span>
+        <input type="text" id="admin-message-search" placeholder="Search by name, email, or topic…" />
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr><th>From</th><th>Topic</th><th>Message</th><th>Received</th><th></th></tr>
+          </thead>
+          <tbody id="admin-messages-body">
+            <tr><td colspan="5" class="muted center">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Broadcasts panel -->
+    <div class="admin-panel" data-panel="broadcasts">
+      <div class="card" style="max-width:640px; margin-bottom:28px;">
+        <h3>Send a broadcast</h3>
+        <p class="muted">Shows as a dismissible banner to every signed-in user on their dashboard.</p>
+        <div id="broadcast-msg" class="msg hidden"></div>
+        <label for="broadcast-title">Title</label>
+        <input type="text" id="broadcast-title" placeholder="e.g. Scheduled maintenance tonight" />
+        <label for="broadcast-body">Message</label>
+        <textarea id="broadcast-body" rows="3" placeholder="Details for users…"></textarea>
+        <button id="broadcast-send-btn" class="btn btn-primary">Send to everyone</button>
+      </div>
+
+      <div class="section-heading-row">
+        <h3 style="margin:0;">Sent broadcasts</h3>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Title</th><th>Message</th><th>Sent</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody id="admin-broadcasts-body">
+            <tr><td colspan="5" class="muted center">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Settings panel -->
+    <div class="admin-panel" data-panel="settings">
+      <div class="card" style="max-width:560px;">
+        <h3>Promote another admin</h3>
+        <p class="muted">Grant admin access to an existing user by email. They'll be redirected to the Admin Portal on their next sign-in.</p>
+        <div id="admin-promote-msg" class="msg hidden"></div>
+        <label for="promote-email">User email</label>
+        <input type="email" id="promote-email" placeholder="teammate@example.com" />
+        <button id="promote-btn" class="btn btn-primary">Grant admin access</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

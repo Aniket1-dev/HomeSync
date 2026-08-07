@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your matches — HomeSync AI</title>
+<meta name="robots" content="noindex, follow" />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/png" href="assets/favicon-64.png" />
+</head>
+<body>
+<script>(function(){try{if(localStorage.getItem('homesync-theme')==='light'){document.body.classList.add('light');}}catch(e){}})();</script>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div>
+    <button id="nav-toggle" class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="nav-links">
+      <button id="theme-toggle" class="theme-toggle" type="button" title="Toggle theme" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+      <a href="#" id="edit-profile-link">Edit lifestyle profile</a>
+      <a href="profile.html">My account</a>
+      <a href="#" id="logout-btn" class="btn btn-ghost">Sign out</a>
+    </div>
+  </div>
+</nav>
+
+<section class="wrap section-tight">
+
+  <!-- Admin broadcast banner (populated by dashboard.js, hidden if no active broadcast) -->
+  <div id="broadcast-banner" class="hidden" style="display:flex; align-items:flex-start; gap:12px; justify-content:space-between; background:var(--card); border:1px solid var(--line); border-left:3px solid var(--sage); border-radius:12px; padding:14px 18px; margin-bottom:20px;">
+    <div>
+      <div style="font-weight:700; margin-bottom:2px;" id="broadcast-banner-title"></div>
+      <div class="muted" style="font-size:0.9rem;" id="broadcast-banner-body"></div>
+    </div>
+    <button type="button" id="broadcast-banner-dismiss" class="admin-icon-btn" title="Dismiss" style="flex-shrink:0;">✕</button>
+  </div>
+
+  <!-- Hero banner -->
+  <div class="dash-banner">
+    <div class="dash-banner-text">
+      <span class="eyebrow">Your matches</span>
+      <h2>Welcome back, <span id="welcome-name">there</span>.</h2>
+      <p>Ranked by structured compatibility — sleep, cleanliness, budget, and more. Matching within your city for now.</p>
+    </div>
+    <div class="dash-banner-actions">
+      <a href="onboarding.html" class="btn btn-primary">Refine my lifestyle profile</a>
+      <a href="#matches" class="btn btn-ghost">Jump to matches</a>
+    </div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stat-row" id="stat-row">
+    <div class="card stat-card">
+      <div class="stat-card-top"><span class="stat-card-icon">🤝</span></div>
+      <div class="stat-card-val" id="stat-match-count">—</div>
+      <div class="stat-card-label">Matches found</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-card-top"><span class="stat-card-icon">🏆</span></div>
+      <div class="stat-card-val" id="stat-top-score">—</div>
+      <div class="stat-card-label">Top compatibility score</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-card-top"><span class="stat-card-icon">📍</span></div>
+      <div class="stat-card-val" id="stat-city">—</div>
+      <div class="stat-card-label">Matching city</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-card-top"><span class="stat-card-icon">✅</span></div>
+      <div class="stat-card-val" id="stat-completeness">—</div>
+      <div class="stat-card-label">Profile completeness</div>
+      <div class="stat-card-trend up" id="stat-completeness-hint"></div>
+    </div>
+  </div>
+
+  <!-- Premium upsell banner -->
+  <div class="premium-banner">
+    <div>
+      <div class="premium-banner-badge">✨ Coming soon</div>
+      <div class="premium-banner-title">HomeSync AI Premium</div>
+      <p class="premium-banner-sub">Unlock priority matching, unlimited cross-city search and AI-written icebreakers — free for the B.Tech prototype cohort.</p>
+    </div>
+    <button class="btn btn-primary" id="premium-notify-btn">Notify me</button>
+  </div>
+
+  <div class="dash-layout">
+    <!-- Sidebar -->
+    <div class="dash-sidebar">
+      <a href="#matches" class="active">🤝 Matches</a>
+      <a href="onboarding.html">🌙 Lifestyle profile</a>
+      <a href="profile.html">👤 My account</a>
+      <a href="faq.html">❓ FAQ</a>
+      <a href="contact.html">✉️ Support</a>
+    </div>
+
+    <!-- Main content -->
+    <div>
+      <div class="section-heading-row" id="matches">
+        <h3 style="margin:0;">Ranked matches</h3>
+        <div class="filter-chip-row">
+          <button class="filter-chip active" data-sort="score">Best score</button>
+          <button class="filter-chip" data-sort="budget">Lowest budget</button>
+        </div>
+      </div>
+
+      <div id="match-list"></div>
+    </div>
+  </div>
+
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>© 2026 HomeSync AI — B.Tech Project-II prototype</span>
+    <span>Aniket · Anchal Garg · Anant Saxena · Ayush Chauhan</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/matching.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
