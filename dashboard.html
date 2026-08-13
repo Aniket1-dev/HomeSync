@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style id="auth-gate">html{visibility:hidden}</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smitten — My Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/dashboard.css">
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/ui-helpers.js"></script>
+<script src="assets/js/api.js"></script>
+</head>
+<body>
+<script>AUTH.requireAuth();</script>
+
+<svg style="position:absolute;width:0;height:0;"><defs>
+  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
+</defs></svg>
+
+<div class="ambient"><div class="blob b1"></div><div class="blob b2"></div></div>
+
+<nav class="app-nav">
+  <div class="brand"><svg viewBox="0 0 100 92" style="width:18px;height:18px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten</div>
+  <div class="links">
+    <a class="current" href="#">My Notes</a>
+    <a href="invitations.html">All Notes</a>
+    <a href="templates.html">Templates</a>
+    <a href="studio.html">Studio</a>
+    <a href="profile.html">Profile</a>
+  </div>
+  <a href="profile.html" class="avatar" style="display:block;" id="nav-avatar"></a>
+</nav>
+
+<div class="wrap">
+  <div class="dash-hero">
+    <div class="eyebrow" id="dash-greeting">hi 👋</div>
+    <h1>Here's what's<br>coming up.</h1>
+  </div>
+
+  <div id="dash-next-wrap"></div>
+
+  <a href="templates.html" style="display:block;">
+    <div class="dash-cta">
+      <div class="dash-cta-l">
+        <div class="plus-badge">+</div>
+        <div>
+          <h3>Start a new note</h3>
+          <p>Blank page or one of six templates — your call.</p>
+        </div>
+      </div>
+      <span class="pill-btn yellow sticker-shadow-sm" style="font-size:12px;padding:11px 18px;">Begin →</span>
+    </div>
+  </a>
+
+  <div class="dash-section">
+    <div class="sec-head">
+      <h2>Your notes</h2>
+      <a href="invitations.html" style="font-size:12.5px;font-weight:700;color:var(--pink);">See all →</a>
+    </div>
+    <div class="hscroll" id="dash-notes">⏳ Loading…</div>
+  </div>
+</div>
+
+<script>
+const STATUS_TAG = {
+  draft: { cls: "draft", label: "Draft" },
+  sent: { cls: "sent", label: "Sent" },
+  opened: { cls: "opened", label: "Opened" },
+  responded: { cls: "opened", label: "Responded" },
+  accepted: { cls: "yes", label: "Said yes" },
+  declined: { cls: "sent", label: "Said no" },
+  expired: { cls: "sent", label: "Expired" },
+  revoked: { cls: "sent", label: "Revoked" },
+};
+
+function noteSubtitle(inv) {
+  if (inv.status === "draft") return "Not scheduled yet";
+  const parts = [];
+  if (inv.templates?.name) parts.push(inv.templates.name);
+  if (inv.scheduled_date) parts.push(UI.fmtDateShort(inv.scheduled_date) + (inv.scheduled_time ? ", " + UI.fmtTime(inv.scheduled_time) : ""));
+  return parts.join(" · ") || "Not scheduled yet";
+}
+
+function noteHref(inv) {
+  return inv.status === "draft" ? `studio.html?id=${inv.id}` : `invite-preview.html?id=${inv.id}`;
+}
+
+async function loadDashboard() {
+  const notesEl = document.getElementById("dash-notes");
+  try {
+    const [profile, invitations] = await Promise.all([API.getMyProfile(), API.listMyInvitations()]);
+
+    const greetName = profile?.display_name || profile?.full_name?.split(" ")[0] || "there";
+    document.getElementById("dash-greeting").textContent = `hi ${greetName} 👋`;
+
+    // "Next date" card: soonest accepted invitation with a scheduled date in the future
+    const upcoming = invitations
+      .filter((i) => i.status === "accepted" && i.scheduled_date)
+      .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))[0];
+
+    const nextWrap = document.getElementById("dash-next-wrap");
+    if (upcoming) {
+      nextWrap.innerHTML = `
+        <div class="dash-next">
+          <div class="dash-next-info">
+            <div class="k">Next date</div>
+            <h2>${UI.esc(upcoming.title || upcoming.recipient_name || "Your note")}</h2>
+            <ul>
+              ${upcoming.scheduled_date ? `<li>📅 ${UI.fmtDate(upcoming.scheduled_date)}${upcoming.scheduled_time ? " · " + UI.fmtTime(upcoming.scheduled_time) : ""}</li>` : ""}
+              ${upcoming.venue_name ? `<li>📍 ${UI.esc(upcoming.venue_name)}</li>` : ""}
+              <li>💛 They said yes!</li>
+            </ul>
+            <a href="invite-preview.html?id=${upcoming.id}" class="pill-btn paper sticker-shadow-sm" style="font-size:12.5px;padding:12px 20px;">Peek at the note →</a>
+          </div>
+          <div class="dash-next-visual">
+            <svg viewBox="0 0 100 92" style="width:90px;height:90px;stroke:var(--pink);stroke-width:5;fill:var(--card);opacity:.9;"><use href="#d-heart"/></svg>
+          </div>
+        </div>`;
+    } else {
+      nextWrap.innerHTML = `
+        <div class="dash-next">
+          <div class="dash-next-info">
+            <div class="k">Next date</div>
+            <h2>Nothing on the calendar yet</h2>
+            <ul><li>Once someone says yes to a note with a date, it'll show up here.</li></ul>
+            <a href="templates.html" class="pill-btn paper sticker-shadow-sm" style="font-size:12.5px;padding:12px 20px;">Start a note →</a>
+          </div>
+          <div class="dash-next-visual">
+            <svg viewBox="0 0 100 92" style="width:90px;height:90px;stroke:var(--pink);stroke-width:5;fill:var(--card);opacity:.9;"><use href="#d-heart"/></svg>
+          </div>
+        </div>`;
+    }
+
+    if (!invitations.length) {
+      notesEl.innerHTML = `<div style="padding:30px 4px;color:var(--ink-soft);font-size:13.5px;">You haven't started any notes yet — <a href="templates.html" style="color:var(--pink);font-weight:700;">pick a template</a> to begin.</div>`;
+      return;
+    }
+
+    notesEl.innerHTML = invitations.slice(0, 10).map((inv) => {
+      const tag = STATUS_TAG[inv.status] || { cls: "draft", label: inv.status };
+      return `<a class="note-tile" href="${noteHref(inv)}" style="display:block;"><span class="tag ${tag.cls}">${UI.esc(tag.label)}</span><h3>${UI.esc(inv.recipient_name || inv.title || "Untitled note")}</h3><p>${UI.esc(noteSubtitle(inv))}</p></a>`;
+    }).join("");
+  } catch (err) {
+    notesEl.innerHTML = UI.errorBlock(UI.friendlyError(err), loadDashboard);
+  }
+}
+loadDashboard();
+</script>
+
+</body>
+</html>

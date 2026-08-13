@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style id="auth-gate">html{visibility:hidden}</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smitten — Templates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/templates.css">
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/ui-helpers.js"></script>
+<script src="assets/js/api.js"></script>
+</head>
+<body>
+<script>AUTH.requireAuth();</script>
+<svg style="position:absolute;width:0;height:0;"><defs>
+  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
+</defs></svg>
+<div class="ambient"><div class="blob b1"></div><div class="blob b2"></div></div>
+<nav class="app-nav">
+  <div class="brand"><svg viewBox="0 0 100 92" style="width:18px;height:18px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten</div>
+  <div class="links">
+    <a href="dashboard.html">My Notes</a>
+    <a href="invitations.html">All Notes</a>
+    <a class="current" href="#">Templates</a>
+    <a href="studio.html">Studio</a>
+    <a href="profile.html">Profile</a>
+  </div>
+  <div class="avatar"></div>
+</nav>
+<div class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">the collection</div>
+    <h1>Pick a starting point.</h1>
+    <p>Every template is fully yours to rearrange — add, remove, or reorder anything once you're inside the Studio.</p>
+  </div>
+  <div class="tpl-grid" id="tpl-grid">⏳ Loading templates…</div>
+  <div style="padding-bottom:80px;">
+    <button type="button" class="blank-card" id="blank-start" style="max-width:340px;border:2.5px solid var(--ink);cursor:pointer;">
+      <div class="plus">+</div>
+      <h3>Start from blank</h3>
+      <p>Just you and an empty page.</p>
+    </button>
+  </div>
+</div>
+<script>
+const GRADIENTS = [
+  "linear-gradient(150deg,var(--pink-soft),var(--mint-soft))",
+  "linear-gradient(150deg,var(--yellow-soft),var(--peach))",
+  "linear-gradient(150deg,var(--lavender-soft),var(--pink-soft))",
+  "linear-gradient(150deg,var(--mint-soft),var(--yellow-soft))",
+  "linear-gradient(150deg,var(--lavender-soft),var(--mint-soft))",
+  "linear-gradient(150deg,var(--pink-soft),var(--lavender-soft))",
+];
+
+async function startFromTemplate(templateId, btn) {
+  const original = btn.textContent;
+  btn.textContent = "Setting up…";
+  btn.style.pointerEvents = "none";
+  try {
+    const inv = await API.createInvitation({ templateId, title: "Untitled note" });
+    window.location.href = `studio.html?id=${inv.id}`;
+  } catch (err) {
+    UI.toast(UI.friendlyError(err), "error");
+    btn.textContent = original;
+    btn.style.pointerEvents = "";
+  }
+}
+
+async function loadTemplates() {
+  const grid = document.getElementById("tpl-grid");
+  try {
+    const templates = await API.listPublishedTemplates();
+    if (!templates.length) {
+      grid.innerHTML = UI.emptyBlock("No templates published yet", "Check back soon, or start from a blank page below.");
+      return;
+    }
+    grid.innerHTML = templates.map((t, i) => {
+      const accent = (t.theme && t.theme.accent) || "var(--pink)";
+      return `<div class="tpl-card" style="cursor:pointer;" data-id="${t.id}">
+        <a href="template-detail.html?id=${t.id}" class="tpl-thumb" style="background:${GRADIENTS[i % GRADIENTS.length]};display:flex;">
+          <svg viewBox="0 0 100 92" style="stroke:${accent};stroke-width:5;fill:var(--card);"><use href="#d-heart"/></svg>
+        </a>
+        <div class="tpl-body">
+          <h3>${UI.esc(t.name)}</h3>
+          <p>${UI.esc(t.description || "")}</p>
+          <span class="pill-btn paper sticker-shadow-sm use-tpl-btn" data-id="${t.id}">Use this template</span>
+        </div>
+      </div>`;
+    }).join("");
+
+    grid.querySelectorAll(".use-tpl-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        startFromTemplate(btn.dataset.id, btn);
+      });
+    });
+  } catch (err) {
+    grid.innerHTML = UI.errorBlock(UI.friendlyError(err), loadTemplates);
+  }
+}
+loadTemplates();
+
+document.getElementById("blank-start").addEventListener("click", () => startFromTemplate(null, document.getElementById("blank-start")));
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style id="auth-gate">html{visibility:hidden}</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smitten — Puppy Love template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<style>
+  .crumb{ font-size:12.5px; font-weight:700; color:var(--ink-soft); padding:26px 0 0; }
+  .crumb a{ color:var(--pink); }
+  .tpl-hero{ display:grid; grid-template-columns:1fr 1fr; gap:34px; align-items:center; padding:26px 0 50px; }
+  @media (max-width:820px){ .tpl-hero{ grid-template-columns:1fr; } }
+  .tpl-visual{ height:360px; border-radius:24px; border:2.5px solid var(--ink); background:linear-gradient(150deg,var(--pink-soft),var(--mint-soft)); display:flex; align-items:center; justify-content:center; box-shadow:6px 6px 0 rgba(58,43,57,.1); }
+  .tpl-info h1{ font-size:38px; margin:12px 0 12px; }
+  .tpl-info p{ color:var(--ink-soft); font-size:14.5px; line-height:1.7; margin-bottom:24px; }
+  .swatches{ display:flex; gap:8px; margin-bottom:26px; }
+  .swatches span{ width:28px; height:28px; border-radius:50%; border:2px solid var(--ink); }
+  .sections-used{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }
+  .sections-used span{ font-size:11.5px; font-weight:700; padding:6px 13px; border-radius:100px; border:1.5px solid var(--ink); color:var(--ink-soft); }
+</style>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/ui-helpers.js"></script>
+<script src="assets/js/api.js"></script>
+</head>
+<body>
+<script>AUTH.requireAuth();</script>
+<svg style="position:absolute;width:0;height:0;"><defs>
+  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
+</defs></svg>
+<div class="ambient"><div class="blob b1"></div><div class="blob b2"></div></div>
+<nav class="app-nav">
+  <div class="brand"><svg viewBox="0 0 100 92" style="width:18px;height:18px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten</div>
+  <div class="links">
+    <a href="dashboard.html">My Notes</a>
+    <a class="current" href="templates.html">Templates</a>
+    <a href="studio.html">Studio</a>
+    <a href="profile.html">Profile</a>
+  </div>
+  <a href="profile.html" class="avatar" style="display:block;"></a>
+</nav>
+<div class="wrap">
+  <div class="crumb"><a href="templates.html">← Back to the Collection</a></div>
+  <div class="tpl-hero" id="tpl-hero">⏳ Loading…</div>
+</div>
+<script>
+function paramId() { return new URLSearchParams(window.location.search).get("id"); }
+
+async function load() {
+  const wrap = document.getElementById("tpl-hero");
+  const id = paramId();
+  if (!id) { wrap.innerHTML = UI.errorBlock("No template specified."); return; }
+  try {
+    const [tpl, sections] = await Promise.all([API.getTemplate(id), API.getTemplateSections(id)]);
+    if (!tpl) { wrap.innerHTML = UI.errorBlock("That template couldn't be found."); return; }
+    document.title = `Smitten — ${tpl.name} template`;
+    const accent = (tpl.theme && tpl.theme.accent) || "#FF6F9C";
+    wrap.innerHTML = `
+      <div class="tpl-visual" style="background:linear-gradient(150deg,${accent}22,${accent}11);">
+        <svg viewBox="0 0 100 92" style="width:90px;height:90px;stroke:${accent};stroke-width:5;fill:var(--card);opacity:.9;"><use href="#d-heart"/></svg>
+      </div>
+      <div class="tpl-info">
+        <div class="eyebrow">${tpl.is_official ? "official template" : "community template"}${tpl.is_published ? "" : " · unpublished"}</div>
+        <h1>${UI.esc(tpl.name)}</h1>
+        <p>${UI.esc(tpl.description || "")}</p>
+        <div class="swatches">
+          <span style="background:${accent};"></span>
+          <span style="background:${accent}55;"></span>
+          <span style="background:#fff;"></span>
+        </div>
+        <div class="sections-used">
+          ${sections.map(s => `<span>${UI.esc(s.section_definitions.label)}</span>`).join("") || "<span>No sections yet</span>"}
+        </div>
+        <button type="button" class="pill-btn pink sticker-shadow-sm" id="use-tpl-btn">Use this template →</button>
+      </div>`;
+    document.getElementById("use-tpl-btn").addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      btn.textContent = "Setting up…";
+      btn.disabled = true;
+      try {
+        const inv = await API.createInvitation({ templateId: tpl.id, title: "Untitled note" });
+        window.location.href = `studio.html?id=${inv.id}`;
+      } catch (err) {
+        UI.toast(UI.friendlyError(err), "error");
+        btn.textContent = "Use this template →";
+        btn.disabled = false;
+      }
+    });
+  } catch (err) {
+    wrap.innerHTML = UI.errorBlock(UI.friendlyError(err), load);
+  }
+}
+load();
+</script>
+</body>
+</html>

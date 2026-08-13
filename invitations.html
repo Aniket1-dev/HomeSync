@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style id="auth-gate">html{visibility:hidden}</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smitten — All Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<style>
+  .page-head{ padding:52px 0 30px; }
+  .page-head h1{ font-size:clamp(32px,6vw,54px); margin:12px 0 6px; }
+  .page-head p{ color:var(--ink-soft); font-size:14px; }
+  .filter-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+  .filter-row .f{ font-size:12.5px; font-weight:700; padding:8px 16px; border-radius:100px; border:2px solid var(--ink); color:var(--ink-soft); cursor:pointer; }
+  .filter-row .f.active{ background:var(--pink); color:#fff; }
+  .list{ display:flex; flex-direction:column; gap:14px; padding-bottom:80px; }
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:16px; background:var(--card); border:2.5px solid var(--ink); border-radius:16px; padding:16px 20px; flex-wrap:wrap; transition:transform .2s var(--bounce), box-shadow .2s var(--bounce); }
+  .row:hover{ transform:translateY(-3px); box-shadow:4px 4px 0 var(--ink); }
+  .row-l{ display:flex; align-items:center; gap:14px; }
+  .row-l .ic{ width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .row-l h3{ font-size:16px; margin-bottom:2px; }
+  .row-l p{ font-size:12px; color:var(--ink-soft); }
+  .row-r{ display:flex; align-items:center; gap:14px; }
+</style>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/ui-helpers.js"></script>
+<script src="assets/js/api.js"></script>
+</head>
+<body>
+<script>AUTH.requireAuth();</script>
+<svg style="position:absolute;width:0;height:0;"><defs>
+  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
+</defs></svg>
+<div class="ambient"><div class="blob b1"></div><div class="blob b2"></div></div>
+<nav class="app-nav">
+  <div class="brand"><svg viewBox="0 0 100 92" style="width:18px;height:18px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten</div>
+  <div class="links">
+    <a href="dashboard.html">My Notes</a>
+    <a href="templates.html">Templates</a>
+    <a href="studio.html">Studio</a>
+    <a href="profile.html">Profile</a>
+  </div>
+  <a href="profile.html" class="avatar" style="display:block;"></a>
+</nav>
+<div class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">all notes</div>
+    <h1>Every note<br>you've sent.</h1>
+    <p>Drafts, sent, opened, and answered — all in one place.</p>
+  </div>
+  <div class="filter-row" id="filter-row">
+    <span class="f active" data-filter="all">All</span>
+    <span class="f" data-filter="draft">Drafts</span>
+    <span class="f" data-filter="sent">Sent</span>
+    <span class="f" data-filter="opened">Opened</span>
+    <span class="f" data-filter="accepted">Said yes</span>
+  </div>
+  <div class="list" id="notes-list">⏳ Loading…</div>
+</div>
+<script>
+const ICONS = { draft: ["#EFEAE3", "✏️"], sent: ["var(--pink-soft)", "💌"], opened: ["var(--lavender-soft)", "👀"],
+  responded: ["var(--lavender-soft)", "👀"], accepted: ["var(--mint-soft)", "💛"], declined: ["#EFEAE3", "💔"],
+  expired: ["#EFEAE3", "⌛"], revoked: ["#EFEAE3", "🚫"] };
+const TAGS = { draft: ["draft", "Draft"], sent: ["sent", "Sent"], opened: ["opened", "Opened"],
+  responded: ["opened", "Responded"], accepted: ["yes", "Said yes"], declined: ["sent", "Said no"],
+  expired: ["sent", "Expired"], revoked: ["sent", "Revoked"] };
+
+let ALL_INVITATIONS = [];
+let currentFilter = "all";
+
+function subtitle(inv) {
+  if (inv.status === "draft") return inv.created_at ? `Started ${UI.fmtRelative(inv.created_at)}` : "Not scheduled yet";
+  const parts = [];
+  if (inv.templates?.name) parts.push(inv.templates.name);
+  if (inv.scheduled_date) parts.push(UI.fmtDateShort(inv.scheduled_date) + (inv.scheduled_time ? ", " + UI.fmtTime(inv.scheduled_time) : ""));
+  return parts.join(" · ") || "Not scheduled yet";
+}
+
+function render() {
+  const listEl = document.getElementById("notes-list");
+  const rows = currentFilter === "all" ? ALL_INVITATIONS
+    : currentFilter === "opened" ? ALL_INVITATIONS.filter(i => ["opened", "responded"].includes(i.status))
+    : ALL_INVITATIONS.filter(i => i.status === currentFilter);
+
+  if (!rows.length) {
+    listEl.innerHTML = UI.emptyBlock("No notes here yet", "Try a different filter, or start a new note from Templates.");
+    return;
+  }
+  listEl.innerHTML = rows.map((inv) => {
+    const [bg, emoji] = ICONS[inv.status] || ICONS.draft;
+    const [tagCls, tagLabel] = TAGS[inv.status] || TAGS.draft;
+    const href = inv.status === "draft" ? `studio.html?id=${inv.id}` : `invite-preview.html?id=${inv.id}`;
+    return `<a class="row" href="${href}">
+      <div class="row-l"><div class="ic" style="background:${bg};">${emoji}</div><div><h3>${UI.esc(inv.recipient_name || inv.title || "Untitled note")}</h3><p>${UI.esc(subtitle(inv))}</p></div></div>
+      <div class="row-r"><span class="tag ${tagCls}">${UI.esc(tagLabel)}</span></div>
+    </a>`;
+  }).join("");
+}
+
+document.getElementById("filter-row").addEventListener("click", (e) => {
+  const f = e.target.closest(".f");
+  if (!f) return;
+  document.querySelectorAll(".f").forEach((el) => el.classList.remove("active"));
+  f.classList.add("active");
+  currentFilter = f.dataset.filter;
+  render();
+});
+
+async function load() {
+  const listEl = document.getElementById("notes-list");
+  try {
+    ALL_INVITATIONS = await API.listMyInvitations();
+    render();
+  } catch (err) {
+    listEl.innerHTML = UI.errorBlock(UI.friendlyError(err), load);
+  }
+}
+load();
+</script>
+</body>
+</html>

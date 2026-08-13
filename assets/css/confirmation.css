@@ -1,0 +1,23 @@
+:root{
+    --paper:#FFF8EF; --card:#FFFFFF; --ink:#3A2B39; --ink-soft:#7A6B78;
+    --pink:#FF6F9C; --pink-soft:#FFE1EC; --yellow:#FFC94A; --yellow-soft:#FFF2CE;
+    --lavender-soft:#EEE7FB; --mint:#5FCBA6; --mint-soft:#DEF7EE;
+    --bounce: cubic-bezier(.34,1.56,.64,1);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ min-height:100%; background:linear-gradient(165deg,var(--mint-soft),var(--yellow-soft) 50%,var(--pink-soft)); color:var(--ink); }
+  body{ font-family:'Quicksand',sans-serif; font-weight:500; display:flex; align-items:center; justify-content:center; padding:40px 20px; position:relative; overflow:hidden; }
+  h1,h2,h3{ font-family:'Fredoka',sans-serif; font-weight:600; }
+  a{ text-decoration:none; color:inherit; }
+  .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+  .confetti span{ position:absolute; font-size:20px; opacity:.7; }
+  .card{ position:relative; z-index:2; background:var(--card); border:2.5px solid var(--ink); border-radius:26px; padding:48px 40px; max-width:420px; width:100%; text-align:center; box-shadow:8px 8px 0 rgba(58,43,57,.12); }
+  .eyebrow{ font-size:12.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--pink); margin-bottom:10px; }
+  h1{ font-size:38px; margin-bottom:6px; }
+  .names{ font-family:'Caveat'; font-weight:700; font-size:26px; color:var(--pink); margin-bottom:26px; }
+  .details{ text-align:left; list-style:none; font-size:14px; line-height:2.2; margin-bottom:30px; background:var(--paper); border:2px dashed rgba(58,43,57,0.25); border-radius:16px; padding:18px 22px; }
+  .btn-row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:18px; }
+  .pill-btn{ display:inline-flex; align-items:center; gap:7px; font-weight:700; font-size:13px; padding:12px 20px; border-radius:100px; border:2.5px solid var(--ink); background:var(--card); transition:transform .2s var(--bounce), box-shadow .2s var(--bounce); }
+  .pill-btn:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--ink); }
+  .pill-btn.pink{ background:var(--pink); color:#fff; }
+  .back{ font-size:12.5px; font-weight:700; color:var(--ink-soft); }

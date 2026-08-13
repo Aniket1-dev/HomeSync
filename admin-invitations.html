@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style id="auth-gate">html{visibility:hidden}</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smitten — Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/admin.css">
+
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/ui-helpers.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/admin-shell.js"></script>
+</head>
+<body>
+<script>AUTH.requireAdmin();</script>
+<svg style="position:absolute;width:0;height:0;"><defs>
+  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
+</defs></svg>
+<aside>
+  <div class="brand"><svg viewBox="0 0 100 92" style="width:18px;height:18px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten Admin</div>
+  <div class="god-badge">✦ Super Admin · Full Access</div>
+  <div class="nav-group">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="admin.html"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2" stroke="#3A2B39" stroke-width="2"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="#3A2B39" stroke-width="2"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="#3A2B39" stroke-width="2"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="#3A2B39" stroke-width="2"/></svg> Dashboard</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Manage</div>
+    <a class="nav-item" href="admin-users.html"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#7A6B78" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="#7A6B78" stroke-width="2"/></svg> Users</a>
+    <a class="nav-item active" href="admin-invitations.html"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="3" stroke="#7A6B78" stroke-width="2"/><path d="M3 10h18" stroke="#7A6B78" stroke-width="2"/></svg> Notes / Invitations</a>
+    <a class="nav-item" href="admin-templates.html"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19l1-9 7-7 7 7-1 9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" stroke="#7A6B78" stroke-width="2"/></svg> Templates</a>
+    <a class="nav-item" href="admin-sections.html"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="2" stroke="#7A6B78" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="2" stroke="#7A6B78" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="2" stroke="#7A6B78" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="2" stroke="#7A6B78" stroke-width="2"/></svg> Sections</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Trust & Safety</div>
+    <a class="nav-item" href="admin-reports.html"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 3.5v5c0 5-3.4 8.7-8 9.5-4.6-.8-8-4.5-8-9.5v-5L12 3z" stroke="#7A6B78" stroke-width="2"/></svg> Reports</a>
+    <a class="nav-item" href="admin-audit.html"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#7A6B78" stroke-width="2" stroke-linecap="round"/></svg> Audit Log</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Commerce</div>
+    <a class="nav-item" href="admin-orders.html"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="20" r="1.4" fill="#7A6B78"/><circle cx="18" cy="20" r="1.4" fill="#7A6B78"/><path d="M2 3h3l2.4 12.2a2 2 0 0 0 2 1.8h8.6a2 2 0 0 0 2-1.6L22 8H6" stroke="#7A6B78" stroke-width="2" stroke-linecap="round"/></svg> Orders</a>
+    <a class="nav-item" href="admin-payments.html"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="13" rx="3" stroke="#7A6B78" stroke-width="2"/><path d="M2 10h20" stroke="#7A6B78" stroke-width="2"/></svg> Payments</a>
+    <a class="nav-item" href="admin-analytics.html"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3" stroke="#7A6B78" stroke-width="2" stroke-linecap="round"/></svg> Analytics</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">System</div>
+    <a class="nav-item" href="admin-settings.html"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="#7A6B78" stroke-width="2"/><path d="M19 12a7 7 0 0 0-.2-1.6l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2.8-1.6L13.3 2h-2.6l-.4 2.8a7 7 0 0 0-2.8 1.6l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .5.1 1.1.2 1.6l-2 1.5 2 3.4 2.3-.9c.8.7 1.8 1.3 2.8 1.6l.4 2.8h2.6l.4-2.8a7 7 0 0 0 2.8-1.6l2.3.9 2-3.4-2-1.5c.1-.5.2-1.1.2-1.6z" stroke="#7A6B78" stroke-width="1.6"/></svg> Settings</a>
+  </div>
+  <div style="margin-top:auto;padding:14px 6px 4px;">
+    <a href="dashboard.html" class="nav-item" style="color:var(--ink-soft);">← Back to app</a>
+  </div>
+</aside>
+<main>
+
+  <header class="top">
+    <h1>💌 Notes / Invitations</h1>
+    <div class="search"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#7A6B78" stroke-width="2"/><path d="M21 21l-4-4" stroke="#7A6B78" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="Search isn't wired to this table yet — use status filters" disabled style="opacity:.5;"></div>
+    <div class="topright"><div class="avatar"></div></div>
+  </header>
+  <div class="stats" id="inv-stats">
+    <div class="stat a1"><div class="num">…</div><div class="lbl">Total notes</div></div>
+    <div class="stat a2"><div class="num">…</div><div class="lbl">Opened</div></div>
+    <div class="stat a3"><div class="num">…</div><div class="lbl">Said yes</div></div>
+    <div class="stat a4"><div class="num">…</div><div class="lbl">Expiring soon</div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head">
+      <h3>All notes</h3>
+      <div class="tabs" id="inv-tabs">
+        <div class="tab active" data-status="">All</div><div class="tab" data-status="draft">Draft</div><div class="tab" data-status="sent">Sent</div><div class="tab" data-status="opened">Opened</div><div class="tab" data-status="accepted">Accepted</div><div class="tab" data-status="revoked">Revoked</div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>From → To</th><th>Template</th><th>Status</th><th>Sent</th><th>Token</th><th>Actions</th></tr></thead>
+      <tbody id="inv-tbody"><tr><td colspan="6" style="text-align:center;padding:36px;color:var(--ink-soft);">⏳ Loading…</td></tr></tbody>
+    </table>
+    <div class="panel-foot"><span id="inv-count"></span><div style="display:flex;gap:8px;"><button class="pill-btn" id="inv-prev">Prev</button><button class="pill-btn" id="inv-next">Next</button></div></div>
+  </div>
+
+</main>
+<script>
+const PAGE_SIZE = 20;
+let page = 0;
+let status = "";
+
+const STATUS_TAG = { draft: "draft", sent: "pending", opened: "pending", responded: "pending",
+  accepted: "active", declined: "suspended", expired: "suspended", revoked: "suspended" };
+
+async function loadStats() {
+  const el = document.getElementById("inv-stats");
+  try {
+    const s = await API.admin.stats();
+    el.innerHTML = `
+      <div class="stat a1"><div class="num">${s.notes_sent.toLocaleString()}</div><div class="lbl">Total notes</div></div>
+      <div class="stat a2"><div class="num">${s.opened.toLocaleString()}</div><div class="lbl">Opened</div></div>
+      <div class="stat a3"><div class="num">${s.acceptance_rate}%</div><div class="lbl">Said yes</div></div>
+      <div class="stat a4"><div class="num">${s.expiring_soon}</div><div class="lbl">Expiring soon</div></div>`;
+  } catch (err) { el.innerHTML = UI.errorBlock(UI.friendlyError(err)); }
+}
+loadStats();
+
+async function loadTable() {
+  const tbody = document.getElementById("inv-tbody");
+  tbody.innerHTML = UI.loadingRow(6);
+  try {
+    const { rows, count } = await API.admin.listInvitations({ page, pageSize: PAGE_SIZE, status: status || null });
+    if (!rows.length) { tbody.innerHTML = UI.emptyRow(6, "No notes match this filter."); }
+    else {
+      tbody.innerHTML = rows.map((inv) => `
+        <tr data-id="${inv.id}">
+          <td><div class="name">${UI.esc(inv.creator?.email || "?")} → ${UI.esc(inv.recipient_name || "?")}</div><div class="sub-text">${inv.scheduled_date ? UI.fmtDate(inv.scheduled_date) : "no date"}${inv.venue_name ? " · " + UI.esc(inv.venue_name) : ""}</div></td>
+          <td>${UI.esc(inv.templates?.name || "—")}</td>
+          <td><span class="tag ${STATUS_TAG[inv.status] || "draft"}">${UI.esc(inv.status)}</span></td>
+          <td>${inv.published_at ? UI.fmtRelative(inv.published_at) : "—"}</td>
+          <td class="sub-text">${UI.esc((inv.public_token || "").slice(0, 8))}...</td>
+          <td class="row-actions">
+            <button class="icon-btn" data-action="regen" data-id="${inv.id}" title="Regenerate link"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 14-5M20 12a8 8 0 0 1-14 5M17 4v4h-4M7 20v-4h4" stroke="#3A2B39" stroke-width="2" stroke-linecap="round"/></svg></button>
+            ${inv.status !== "revoked" ? `<button class="icon-btn danger" data-action="revoke" data-id="${inv.id}" title="Revoke link"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#E15B4E" stroke-width="2" stroke-linecap="round"/></svg></button>` : ""}
+          </td>
+        </tr>`).join("");
+    }
+    document.getElementById("inv-count").textContent = `Showing ${rows.length} of ${count} notes`;
+    document.getElementById("inv-prev").disabled = page === 0;
+    document.getElementById("inv-next").disabled = (page + 1) * PAGE_SIZE >= count;
+  } catch (err) {
+    tbody.innerHTML = UI.errorRow(6, UI.friendlyError(err));
+  }
+}
+loadTable();
+
+document.getElementById("inv-tabs").addEventListener("click", (e) => {
+  const tab = e.target.closest(".tab");
+  if (!tab) return;
+  document.querySelectorAll("#inv-tabs .tab").forEach(t => t.classList.remove("active"));
+  tab.classList.add("active");
+  status = tab.dataset.status;
+  page = 0;
+  loadTable();
+});
+document.getElementById("inv-prev").addEventListener("click", () => { if (page > 0) { page--; loadTable(); } });
+document.getElementById("inv-next").addEventListener("click", () => { page++; loadTable(); });
+
+document.getElementById("inv-tbody").addEventListener("click", async (e) => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+  try {
+    if (btn.dataset.action === "revoke") {
+      if (!confirm("Revoke this note's link? The recipient will no longer be able to open it.")) return;
+      await API.admin.revokeInvitation(btn.dataset.id);
+      UI.toast("Link revoked", "success");
+    } else if (btn.dataset.action === "regen") {
+      const newToken = await API.admin.regenerateInvitationToken(btn.dataset.id);
+      const link = API.inviteUrl(newToken);
+      try { await navigator.clipboard.writeText(link); } catch (_) {}
+      alert(`New link (copied to clipboard):\n${link}`);
+    }
+    loadTable();
+  } catch (err) {
+    UI.toast(UI.friendlyError(err), "error");
+  }
+});
+</script>
+</body>
+</html>

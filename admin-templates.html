@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style id="auth-gate">html{visibility:hidden}</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smitten — Templates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/admin.css">
+
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/ui-helpers.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/admin-shell.js"></script>
+</head>
+<body>
+<script>AUTH.requireAdmin();</script>
+<svg style="position:absolute;width:0;height:0;"><defs>
+  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
+</defs></svg>
+<aside>
+  <div class="brand"><svg viewBox="0 0 100 92" style="width:18px;height:18px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten Admin</div>
+  <div class="god-badge">✦ Super Admin · Full Access</div>
+  <div class="nav-group">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="admin.html"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2" stroke="#3A2B39" stroke-width="2"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="#3A2B39" stroke-width="2"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="#3A2B39" stroke-width="2"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="#3A2B39" stroke-width="2"/></svg> Dashboard</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Manage</div>
+    <a class="nav-item" href="admin-users.html"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#7A6B78" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="#7A6B78" stroke-width="2"/></svg> Users</a>
+    <a class="nav-item" href="admin-invitations.html"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="3" stroke="#7A6B78" stroke-width="2"/><path d="M3 10h18" stroke="#7A6B78" stroke-width="2"/></svg> Notes / Invitations</a>
+    <a class="nav-item active" href="admin-templates.html"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19l1-9 7-7 7 7-1 9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" stroke="#7A6B78" stroke-width="2"/></svg> Templates</a>
+    <a class="nav-item" href="admin-sections.html"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="2" stroke="#7A6B78" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="2" stroke="#7A6B78" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="2" stroke="#7A6B78" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="2" stroke="#7A6B78" stroke-width="2"/></svg> Sections</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Trust & Safety</div>
+    <a class="nav-item" href="admin-reports.html"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 3.5v5c0 5-3.4 8.7-8 9.5-4.6-.8-8-4.5-8-9.5v-5L12 3z" stroke="#7A6B78" stroke-width="2"/></svg> Reports</a>
+    <a class="nav-item" href="admin-audit.html"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#7A6B78" stroke-width="2" stroke-linecap="round"/></svg> Audit Log</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Commerce</div>
+    <a class="nav-item" href="admin-orders.html"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="20" r="1.4" fill="#7A6B78"/><circle cx="18" cy="20" r="1.4" fill="#7A6B78"/><path d="M2 3h3l2.4 12.2a2 2 0 0 0 2 1.8h8.6a2 2 0 0 0 2-1.6L22 8H6" stroke="#7A6B78" stroke-width="2" stroke-linecap="round"/></svg> Orders</a>
+    <a class="nav-item" href="admin-payments.html"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="13" rx="3" stroke="#7A6B78" stroke-width="2"/><path d="M2 10h20" stroke="#7A6B78" stroke-width="2"/></svg> Payments</a>
+    <a class="nav-item" href="admin-analytics.html"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3" stroke="#7A6B78" stroke-width="2" stroke-linecap="round"/></svg> Analytics</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">System</div>
+    <a class="nav-item" href="admin-settings.html"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="#7A6B78" stroke-width="2"/><path d="M19 12a7 7 0 0 0-.2-1.6l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2.8-1.6L13.3 2h-2.6l-.4 2.8a7 7 0 0 0-2.8 1.6l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .5.1 1.1.2 1.6l-2 1.5 2 3.4 2.3-.9c.8.7 1.8 1.3 2.8 1.6l.4 2.8h2.6l.4-2.8a7 7 0 0 0 2.8-1.6l2.3.9 2-3.4-2-1.5c.1-.5.2-1.1.2-1.6z" stroke="#7A6B78" stroke-width="1.6"/></svg> Settings</a>
+  </div>
+  <div style="margin-top:auto;padding:14px 6px 4px;">
+    <a href="dashboard.html" class="nav-item" style="color:var(--ink-soft);">← Back to app</a>
+  </div>
+</aside>
+<main>
+
+  <header class="top">
+    <h1>🎀 Templates</h1>
+    <div class="topright"><button class="pill-btn pink" id="new-tpl-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg> New template</button><div class="avatar"></div></div>
+  </header>
+  <div class="panel">
+    <div class="panel-head"><h3>Official templates</h3><div class="tabs" id="tpl-tabs"><div class="tab active" data-filter="all">All</div><div class="tab" data-filter="published">Published</div><div class="tab" data-filter="draft">Drafts</div></div></div>
+    <table>
+      <thead><tr><th>Template</th><th>Sections</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="tpl-tbody"><tr><td colspan="4" style="text-align:center;padding:36px;color:var(--ink-soft);">⏳ Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+</main>
+<script>
+let TEMPLATES = [];
+let tplFilter = "all";
+
+function render() {
+  const tbody = document.getElementById("tpl-tbody");
+  const rows = tplFilter === "all" ? TEMPLATES : TEMPLATES.filter(t => tplFilter === "published" ? t.is_published : !t.is_published);
+  if (!rows.length) { tbody.innerHTML = UI.emptyRow(4, "No templates here."); return; }
+  tbody.innerHTML = rows.map(t => `
+    <tr data-id="${t.id}">
+      <td class="name">${UI.esc(t.name)}</td>
+      <td>${t.template_sections?.[0]?.count ?? 0}</td>
+      <td><span class="tag ${t.is_published ? "active" : "draft"}">${t.is_published ? "published" : "draft"}</span></td>
+      <td class="row-actions">
+        <button class="pill-btn ghost sm" data-action="edit" data-id="${t.id}">Edit</button>
+        <button class="pill-btn ghost sm" data-action="toggle" data-id="${t.id}" data-pub="${t.is_published}">${t.is_published ? "Unpublish" : "Publish"}</button>
+        <button class="icon-btn danger" data-action="delete" data-id="${t.id}" title="Delete"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke="#E15B4E" stroke-width="2" stroke-linecap="round"/></svg></button>
+      </td>
+    </tr>`).join("");
+}
+
+async function load() {
+  try {
+    TEMPLATES = await API.admin.listTemplates();
+    render();
+  } catch (err) {
+    document.getElementById("tpl-tbody").innerHTML = UI.errorRow(4, UI.friendlyError(err));
+  }
+}
+load();
+
+document.getElementById("tpl-tabs").addEventListener("click", (e) => {
+  const tab = e.target.closest(".tab");
+  if (!tab) return;
+  document.querySelectorAll("#tpl-tabs .tab").forEach(t => t.classList.remove("active"));
+  tab.classList.add("active");
+  tplFilter = tab.dataset.filter;
+  render();
+});
+
+document.getElementById("tpl-tbody").addEventListener("click", async (e) => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+  const id = btn.dataset.id;
+  const tpl = TEMPLATES.find(t => t.id === id);
+  try {
+    if (btn.dataset.action === "toggle") {
+      await API.admin.updateTemplate(id, { is_published: btn.dataset.pub !== "true" });
+      UI.toast(btn.dataset.pub === "true" ? "Unpublished" : "Published", "success");
+      load();
+    } else if (btn.dataset.action === "delete") {
+      if (!confirm(`Delete "${tpl.name}"? This can't be undone.`)) return;
+      await API.admin.deleteTemplate(id);
+      UI.toast("Template deleted", "success");
+      load();
+    } else if (btn.dataset.action === "edit") {
+      const name = prompt("Template name:", tpl.name);
+      if (name === null) return;
+      const description = prompt("Description:", tpl.description || "");
+      await API.admin.updateTemplate(id, { name: name.trim() || tpl.name, description: description });
+      UI.toast("Template updated", "success");
+      load();
+    }
+  } catch (err) {
+    UI.toast(UI.friendlyError(err), "error");
+  }
+});
+
+document.getElementById("new-tpl-btn").addEventListener("click", async () => {
+  const name = prompt("New template name:");
+  if (!name) return;
+  const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  try {
+    const tpl = await API.admin.createTemplate({ name: name.trim(), slug, is_published: false, is_official: true, description: "" });
+    UI.toast("Template created — add sections, then publish", "success");
+    load();
+  } catch (err) {
+    UI.toast(UI.friendlyError(err), "error");
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smitten — Complete your profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/auth-shared.css">
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/auth.js"></script>
+<style>
+  body{ display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+  .card{ position:relative; z-index:2; background:var(--card); border:2.5px solid var(--ink); border-radius:22px; padding:42px 40px; width:100%; max-width:460px; box-shadow:6px 6px 0 var(--ink); }
+  .brand{ display:flex; align-items:center; justify-content:center; gap:9px; font-family:'Fredoka'; font-weight:600; font-size:15px; margin-bottom:8px; }
+  .steps{ display:flex; justify-content:center; gap:6px; margin-bottom:22px; }
+  .steps span{ width:26px; height:6px; border-radius:6px; background:var(--paper-2); border:1.5px solid var(--ink); }
+  .steps span.on{ background:var(--pink); }
+  .card h1{ font-size:24px; text-align:center; margin-bottom:6px; }
+  .sub{ text-align:center; color:var(--ink-soft); font-size:13px; margin-bottom:26px; }
+  .avatar-upload{ width:86px; height:86px; border-radius:50%; margin:0 auto 24px; background:linear-gradient(150deg,var(--lavender-soft),var(--pink-soft)); border:2.5px dashed var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:24px; }
+  .field{ margin-bottom:14px; }
+</style>
+</head>
+<body>
+<svg style="position:absolute;width:0;height:0;"><defs>
+  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
+</defs></svg>
+<div class="ambient"><div class="blob b1"></div><div class="blob b2"></div></div>
+<div class="card">
+  <div class="brand"><svg viewBox="0 0 100 92" style="width:18px;height:18px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten</div>
+  <div class="steps"><span class="on"></span><span class="on"></span><span></span></div>
+  <h1>Let's finish setting you up</h1>
+  <p class="sub">This is what people see when you send them a note.</p>
+  <div class="avatar-upload">📷</div>
+  <div class="form-error" id="form-error"></div>
+  <form id="onboarding-form">
+    <div class="field"><label>Full name</label><input type="text" id="full_name" placeholder="Your full name" required></div>
+    <div class="field"><label>Display name</label><input type="text" id="display_name" placeholder="What should they call you?" required></div>
+    <div class="field"><label>Mobile number</label><input type="tel" id="mobile" placeholder="+91 98765 43210" required></div>
+    <div class="field"><label>Instagram <span class="opt">optional</span></label><input type="text" id="instagram" placeholder="@yourhandle"></div>
+    <button class="pill-btn pink sticker-shadow-sm" type="submit" id="onboarding-submit" style="width:100%;margin-top:10px;">Finish and go to my notes →</button>
+  </form>
+</div>
+<script>
+(async function () {
+  const session = await AUTH.requireAuth();
+  if (!session) return;
+  const meta = session.user.user_metadata || {};
+  if (meta.full_name) document.getElementById("full_name").value = meta.full_name;
+})();
+
+document.getElementById("onboarding-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const submitBtn = document.getElementById("onboarding-submit");
+  const errEl = document.getElementById("form-error");
+  errEl.classList.remove("show");
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Saving…";
+  try {
+    const session = await AUTH.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const userId = session.user.id;
+    const fullName = document.getElementById("full_name").value.trim();
+    const displayName = document.getElementById("display_name").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
+    const instagram = document.getElementById("instagram").value.trim();
+
+    const { error: usersErr } = await sb.from("users").update({ mobile }).eq("id", userId);
+    if (usersErr) throw usersErr;
+
+    const { error: profileErr } = await sb.from("profiles").upsert(
+      { user_id: userId, full_name: fullName, display_name: displayName, instagram: instagram || null },
+      { onConflict: "user_id" }
+    );
+    if (profileErr) throw profileErr;
+
+    window.location.href = "dashboard.html";
+  } catch (err) {
+    errEl.textContent = err.message || "Couldn't save your profile.";
+    errEl.classList.add("show");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Finish and go to my notes →";
+  }
+});
+</script>
+</body>
+</html>

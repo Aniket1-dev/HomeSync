@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smitten — Signing you in…</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/login.css">
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/auth.js"></script>
+</head>
+<body>
+<svg style="position:absolute;width:0;height:0;"><defs>
+  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
+</defs></svg>
+<div class="ambient"><div class="blob b1"></div><div class="blob b2"></div></div>
+<div class="card" style="text-align:center;">
+  <div class="brand" style="justify-content:center;"><svg viewBox="0 0 100 92" style="width:18px;height:18px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten</div>
+  <h1 id="status-title">Signing you in…</h1>
+  <p class="sub" id="status-sub">Just a moment.</p>
+</div>
+<script>
+(async function () {
+  const titleEl = document.getElementById("status-title");
+  const subEl = document.getElementById("status-sub");
+  try {
+    // supabase-js reads the OAuth tokens out of the URL automatically
+    // (detectSessionInUrl: true) — just wait for the session to land.
+    let session = await AUTH.getSession();
+    for (let i = 0; i < 20 && !session; i++) {
+      await new Promise((r) => setTimeout(r, 150));
+      session = await AUTH.getSession();
+    }
+
+    if (!session) {
+      titleEl.textContent = "Couldn't sign you in";
+      subEl.innerHTML = 'Something went wrong with Google sign-in. <a href="login.html">Try again</a>.';
+      return;
+    }
+
+    await AUTH.ensureUserRow(session.user);
+    const complete = await AUTH.hasProfile(session.user.id);
+    window.location.href = complete ? "dashboard.html" : "onboarding.html";
+  } catch (err) {
+    titleEl.textContent = "Couldn't sign you in";
+    subEl.innerHTML = (err && err.message ? err.message : "Unknown error") + ' — <a href="login.html">Try again</a>.';
+  }
+})();
+</script>
+</body>
+</html>

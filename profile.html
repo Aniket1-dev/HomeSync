@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style id="auth-gate">html{visibility:hidden}</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smitten — Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/profile.css">
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/ui-helpers.js"></script>
+<script src="assets/js/api.js"></script>
+</head>
+<body>
+<script>AUTH.requireAuth();</script>
+
+<svg style="position:absolute;width:0;height:0;"><defs>
+  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
+</defs></svg>
+
+<div class="ambient"><div class="blob b1"></div><div class="blob b2"></div></div>
+
+<nav class="app-nav">
+  <div class="brand"><svg viewBox="0 0 100 92" style="width:18px;height:18px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten</div>
+  <div class="links">
+    <a href="dashboard.html">My Notes</a>
+    <a href="invitations.html">All Notes</a>
+    <a href="templates.html">Templates</a>
+    <a href="studio.html">Studio</a>
+    <a class="current" href="#">Profile</a>
+  </div>
+  <div class="avatar-nav"></div>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">your profile</div>
+    <h1>You, on Smitten.</h1>
+    <p>This is what people see when you send them a note.</p>
+  </div>
+
+  <div id="profile-load-state">⏳ Loading your profile…</div>
+
+  <div id="profile-content" style="display:none;">
+    <div class="id-card">
+      <div class="avatar-upload">
+        <span class="cam" id="avatar-initials">📷</span>
+        <span class="badge">✏️</span>
+      </div>
+      <div class="id-info">
+        <h2 id="id-name">—</h2>
+        <p id="id-contact">—</p>
+        <span class="verified-tag" id="id-verified"></span>
+      </div>
+      <a href="settings.html" class="pill-btn ghost">App settings</a>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="n" id="stat-sent">0</div><div class="l">Notes sent</div></div>
+      <div class="stat-card"><div class="n" id="stat-opened">0</div><div class="l">Opened</div></div>
+      <div class="stat-card"><div class="n" id="stat-yes">0</div><div class="l">Said yes</div></div>
+    </div>
+
+    <form class="form-card" id="basic-form">
+      <div class="form-head">
+        <h3>Basic details</h3>
+        <span class="tag-req">Required to publish notes</span>
+      </div>
+      <div class="form-error" id="basic-error" style="display:none;color:#C92A2A;font-size:12.5px;margin-bottom:10px;"></div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Full name</label>
+          <input type="text" id="full_name" placeholder="Your full name" required>
+        </div>
+        <div class="field">
+          <label>Display name <span class="opt">shown to recipients</span></label>
+          <input type="text" id="display_name" placeholder="What should they call you?">
+        </div>
+        <div class="field">
+          <label>Email address</label>
+          <input type="email" id="email" placeholder="you@email.com" disabled style="opacity:.65;">
+        </div>
+        <div class="field">
+          <label>Mobile number</label>
+          <input type="tel" id="mobile" placeholder="+91 98765 43210">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="pill-btn ghost" type="button" id="basic-cancel">Cancel</button>
+        <button class="pill-btn pink sticker-shadow-sm" type="submit">Save changes</button>
+      </div>
+    </form>
+
+    <form class="form-card" id="more-form">
+      <div class="form-head">
+        <h3>A little more about you</h3>
+        <span class="tag-req" style="background:var(--mint-soft);color:#1F8E68;">Optional</span>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Instagram <span class="opt">optional</span></label>
+          <div class="prefix-wrap">
+            <span>@</span>
+            <input type="text" id="instagram" placeholder="yourhandle">
+          </div>
+        </div>
+        <div class="field">
+          <label>Where you're based <span class="opt">optional</span></label>
+          <input type="text" id="location" placeholder="City, country">
+        </div>
+        <div class="field full">
+          <label>Short bio <span class="opt">optional</span></label>
+          <textarea id="bio" maxlength="140" placeholder="A line or two — this shows up on notes that include your intro."></textarea>
+          <span class="hint">Keep it under 140 characters — short and sweet reads best.</span>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="pill-btn ghost" type="button" id="more-cancel">Cancel</button>
+        <button class="pill-btn pink sticker-shadow-sm" type="submit">Save changes</button>
+      </div>
+    </form>
+
+    <div class="danger-card">
+      <div>
+        <h3>Delete account</h3>
+        <p>This removes your profile and every note you've sent. There's no undoing it.</p>
+      </div>
+      <button class="pill-btn danger" id="delete-account-btn">Delete my account</button>
+    </div>
+
+    <div class="logout-row">
+      <a href="admin.html" id="admin-link" style="color:var(--ink-soft);display:none;">Admin portal →</a>
+      <span id="admin-sep" style="display:none;">&nbsp;·&nbsp;</span>
+      <a href="#" id="logout-link">Log out</a>
+    </div>
+  </div>
+</div>
+
+<script>
+let PROFILE = null;
+
+function fillForm(p) {
+  document.getElementById("full_name").value = p.full_name || "";
+  document.getElementById("display_name").value = p.display_name || "";
+  document.getElementById("email").value = p.users?.email || "";
+  document.getElementById("mobile").value = p.users?.mobile || "";
+  document.getElementById("instagram").value = p.instagram || "";
+  document.getElementById("location").value = p.location || "";
+  document.getElementById("bio").value = p.bio || "";
+
+  document.getElementById("id-name").textContent = p.full_name || "Your name";
+  document.getElementById("id-contact").textContent = [p.users?.email, p.users?.mobile].filter(Boolean).join(" · ");
+  document.getElementById("avatar-initials").textContent = UI.initials(p.full_name);
+  const verifiedEl = document.getElementById("id-verified");
+  if (p.users?.email_verified) { verifiedEl.textContent = "✓ Verified account"; verifiedEl.style.display = ""; }
+  else verifiedEl.style.display = "none";
+}
+
+async function loadProfile() {
+  const loadState = document.getElementById("profile-load-state");
+  const content = document.getElementById("profile-content");
+  try {
+    const [profile, stats, session] = await Promise.all([
+      API.getMyProfile(), API.myInvitationStats(), AUTH.getSession(),
+    ]);
+    PROFILE = profile;
+    fillForm(profile || {});
+    document.getElementById("stat-sent").textContent = stats.sent;
+    document.getElementById("stat-opened").textContent = stats.opened;
+    document.getElementById("stat-yes").textContent = stats.accepted;
+
+    const admin = await AUTH.isAdmin(session.user.id);
+    if (admin) {
+      document.getElementById("admin-link").style.display = "";
+      document.getElementById("admin-sep").style.display = "";
+    }
+
+    loadState.style.display = "none";
+    content.style.display = "";
+  } catch (err) {
+    loadState.innerHTML = UI.errorBlock(UI.friendlyError(err), loadProfile);
+  }
+}
+loadProfile();
+
+document.getElementById("basic-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById("basic-error");
+  errEl.style.display = "none";
+  const btn = e.target.querySelector('button[type="submit"]');
+  const original = btn.textContent;
+  btn.disabled = true; btn.textContent = "Saving…";
+  try {
+    const full_name = document.getElementById("full_name").value.trim();
+    const display_name = document.getElementById("display_name").value.trim() || null;
+    const mobile = document.getElementById("mobile").value.trim() || null;
+    if (!full_name) throw new Error("Full name is required.");
+    await API.upsertMyProfile({ full_name, display_name });
+    const user = await AUTH.getUser();
+    const { error } = await sb.from("users").update({ mobile }).eq("id", user.id);
+    if (error) throw error;
+    UI.toast("Profile updated", "success");
+    loadProfile();
+  } catch (err) {
+    errEl.textContent = UI.friendlyError(err);
+    errEl.style.display = "";
+  } finally {
+    btn.disabled = false; btn.textContent = original;
+  }
+});
+document.getElementById("basic-cancel").addEventListener("click", () => fillForm(PROFILE || {}));
+
+document.getElementById("more-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  const original = btn.textContent;
+  btn.disabled = true; btn.textContent = "Saving…";
+  try {
+    await API.upsertMyProfile({
+      full_name: PROFILE?.full_name || document.getElementById("full_name").value.trim() || "New Smitten user",
+      instagram: document.getElementById("instagram").value.trim() || null,
+      location: document.getElementById("location").value.trim() || null,
+      bio: document.getElementById("bio").value.trim() || null,
+    });
+    UI.toast("Profile updated", "success");
+    loadProfile();
+  } catch (err) {
+    UI.toast(UI.friendlyError(err), "error");
+  } finally {
+    btn.disabled = false; btn.textContent = original;
+  }
+});
+document.getElementById("more-cancel").addEventListener("click", () => fillForm(PROFILE || {}));
+
+document.getElementById("delete-account-btn").addEventListener("click", async () => {
+  if (!confirm("This permanently deletes your account and every note you've sent. This can't be undone. Continue?")) return;
+  if (!confirm("Really sure? Type OK to confirm one final time.")) return;
+  try {
+    await API.deleteMyAccount();
+    window.location.href = "index.html";
+  } catch (err) {
+    UI.toast(UI.friendlyError(err), "error");
+  }
+});
+
+document.getElementById("logout-link").addEventListener("click", function (e) {
+  e.preventDefault();
+  AUTH.signOut();
+});
+</script>
+</body>
+</html>

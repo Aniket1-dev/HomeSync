@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style id="auth-gate">html{visibility:hidden}</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smitten — Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<style>
+  .wrap{ max-width:760px; }
+  .page-head{ padding:52px 0 30px; }
+  .page-head h1{ font-size:clamp(30px,5.5vw,46px); margin:12px 0 6px; }
+  .page-head p{ color:var(--ink-soft); font-size:14px; }
+  .settings-card{ background:var(--card); border:2.5px solid var(--ink); border-radius:22px; padding:8px 30px; margin-bottom:26px; }
+  .settings-card h3{ font-size:16px; padding:18px 0 4px; }
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; padding:16px 0; border-bottom:1.5px dashed rgba(58,43,57,0.15); gap:16px; }
+  .toggle-row:last-child{ border-bottom:none; }
+  .t-title{ font-weight:700; font-size:14px; }
+  .t-sub{ font-size:12px; color:var(--ink-soft); }
+</style>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/ui-helpers.js"></script>
+<script src="assets/js/api.js"></script>
+</head>
+<body>
+<script>AUTH.requireAuth();</script>
+<svg style="position:absolute;width:0;height:0;"><defs>
+  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
+</defs></svg>
+<div class="ambient"><div class="blob b1"></div><div class="blob b2"></div></div>
+<nav class="app-nav">
+  <div class="brand"><svg viewBox="0 0 100 92" style="width:18px;height:18px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten</div>
+  <div class="links">
+    <a href="dashboard.html">My Notes</a>
+    <a href="templates.html">Templates</a>
+    <a href="studio.html">Studio</a>
+    <a href="profile.html">Profile</a>
+  </div>
+  <a href="profile.html" class="avatar" style="display:block;"></a>
+</nav>
+<div class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">settings</div>
+    <h1>App settings</h1>
+    <p>Notifications, privacy, and account security. For your name, photo, and bio, head to <a href="profile.html" style="color:var(--pink);font-weight:700;">Profile</a>.</p>
+  </div>
+
+  <div id="settings-load-state">⏳ Loading your settings…</div>
+
+  <div id="settings-content" style="display:none;">
+    <div class="settings-card">
+      <h3>Notifications</h3>
+      <div class="toggle-row">
+        <div><div class="t-title">Someone opened your note</div><div class="t-sub">We'll show it in your notifications the moment they view it</div></div>
+        <label class="switch"><input type="checkbox" data-setting="notify_opened"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="t-title">Someone responded</div><div class="t-sub">Yes, maybe, or no — know right away</div></div>
+        <label class="switch"><input type="checkbox" data-setting="notify_responded"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="t-title">Reminders before the date</div><div class="t-sub">A nudge before an accepted plan</div></div>
+        <label class="switch"><input type="checkbox" data-setting="notify_reminders"><span class="slider"></span></label>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h3>Privacy</h3>
+      <div class="toggle-row">
+        <div><div class="t-title">Show Instagram on notes</div><div class="t-sub">Recipients can see your handle</div></div>
+        <label class="switch"><input type="checkbox" data-setting="show_instagram"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="t-title">Let recipients see when you're online</div><div class="t-sub">A small "seen" indicator on your notes</div></div>
+        <label class="switch"><input type="checkbox" data-setting="show_online"><span class="slider"></span></label>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h3>Security</h3>
+      <div class="toggle-row">
+        <div><div class="t-title">Password</div><div class="t-sub">Set a new password for your account</div></div>
+        <button type="button" class="pill-btn ghost sm" id="change-pw-btn">Change</button>
+      </div>
+      <div class="toggle-row">
+        <div><div class="t-title">Two-step verification</div><div class="t-sub">Coming soon</div></div>
+        <label class="switch"><input type="checkbox" disabled title="Coming soon"><span class="slider"></span></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function loadSettings() {
+  const loadState = document.getElementById("settings-load-state");
+  const content = document.getElementById("settings-content");
+  try {
+    const profile = await API.getMyProfile();
+    const settings = profile?.settings || {};
+    document.querySelectorAll("[data-setting]").forEach((el) => {
+      el.checked = !!settings[el.dataset.setting];
+      el.addEventListener("change", async () => {
+        try {
+          await API.updateMySettings({ [el.dataset.setting]: el.checked });
+          UI.toast("Saved", "success");
+        } catch (err) {
+          el.checked = !el.checked;
+          UI.toast(UI.friendlyError(err), "error");
+        }
+      });
+    });
+    loadState.style.display = "none";
+    content.style.display = "";
+  } catch (err) {
+    loadState.innerHTML = UI.errorBlock(UI.friendlyError(err), loadSettings);
+  }
+}
+loadSettings();
+
+document.getElementById("change-pw-btn").addEventListener("click", async () => {
+  const pw1 = prompt("Enter a new password (min 6 characters):");
+  if (!pw1) return;
+  if (pw1.length < 6) { UI.toast("Password must be at least 6 characters.", "error"); return; }
+  const pw2 = prompt("Confirm your new password:");
+  if (pw1 !== pw2) { UI.toast("Passwords didn't match.", "error"); return; }
+  try {
+    await AUTH.updatePassword(pw1);
+    UI.toast("Password updated", "success");
+  } catch (err) {
+    UI.toast(UI.friendlyError(err), "error");
+  }
+});
+</script>
+</body>
+</html>

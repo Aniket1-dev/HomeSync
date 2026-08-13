@@ -1,0 +1,27 @@
+:root{
+    --paper:#FFF8EF; --paper-2:#FFF1DE; --card:#FFFFFF; --ink:#3A2B39; --ink-soft:#7A6B78;
+    --pink:#FF6F9C; --pink-soft:#FFE1EC; --yellow:#FFC94A; --yellow-soft:#FFF2CE;
+    --lavender:#B9A6E8; --lavender-soft:#EEE7FB; --mint:#5FCBA6; --mint-soft:#DEF7EE;
+    --bounce: cubic-bezier(.34,1.56,.64,1); --ease: cubic-bezier(.22,1,.36,1);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:var(--paper); color:var(--ink); }
+  body{ font-family:'Quicksand',sans-serif; font-weight:500; min-height:100vh; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+  a{ color:inherit; text-decoration:none; }
+  h1,h2{ font-family:'Fredoka',sans-serif; font-weight:600; }
+  .ambient{ position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+  .blob{ position:absolute; border-radius:50%; filter:blur(70px); opacity:.5; }
+  .blob.b1{ width:400px; height:400px; background:var(--pink-soft); top:-100px; right:-100px; }
+  .blob.b2{ width:360px; height:360px; background:var(--mint-soft); bottom:-120px; left:-100px; }
+  .card{ position:relative; z-index:2; background:var(--card); border:2.5px solid var(--ink); border-radius:22px; padding:40px 38px; width:100%; max-width:380px; box-shadow:5px 5px 0 var(--ink); }
+  .brand{ display:flex; align-items:center; justify-content:center; gap:9px; font-family:'Fredoka'; font-weight:600; font-size:15px; margin-bottom:22px; }
+  h1{ font-size:26px; text-align:center; margin-bottom:6px; }
+  .sub{ text-align:center; color:var(--ink-soft); font-size:13px; margin-bottom:26px; }
+  .field{ display:flex; flex-direction:column; gap:7px; margin-bottom:16px; }
+  .field label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); }
+  .field input{ font-family:'Quicksand'; font-weight:600; font-size:14px; background:var(--paper-2); border:2px solid var(--ink); border-radius:12px; padding:12px 14px; }
+  .field input:focus{ outline:none; border-color:var(--pink); background:#fff; }
+  .pill-btn{ width:100%; text-align:center; font-weight:700; font-size:14px; padding:14px; border-radius:100px; border:2.5px solid var(--ink); background:var(--pink); color:#fff; margin-top:8px; cursor:pointer; transition:transform .25s var(--bounce), box-shadow .25s var(--bounce); }
+  .pill-btn:hover{ transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--ink); }
+  .switch{ text-align:center; font-size:12.5px; color:var(--ink-soft); margin-top:18px; }
+  .switch a{ color:var(--pink); font-weight:700; }

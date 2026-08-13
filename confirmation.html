@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>It's a date! — Smitten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/confirmation.css">
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/ui-helpers.js"></script>
+<script src="assets/js/api.js"></script>
+</head>
+<body>
+<svg style="position:absolute;width:0;height:0;"><defs>
+  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
+</defs></svg>
+<div class="confetti" id="confetti"></div>
+<div class="card" id="conf-card">
+  <svg viewBox="0 0 100 92" style="width:44px;height:44px;stroke:var(--pink);stroke-width:5;fill:var(--pink-soft);margin-bottom:16px;"><use href="#d-heart"/></svg>
+  <div class="eyebrow">it's official</div>
+  <h1>It's a date.</h1>
+  <div id="conf-body">Loading…</div>
+  <a href="dashboard.html" class="back">← Back to my notes</a>
+</div>
+<script src="assets/js/confirmation.js"></script>
+</body>
+</html>
