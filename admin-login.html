@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin sign in — HomeSync AI</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/png" href="assets/favicon-64.png" />
+</head>
+<body>
+<script>(function(){try{if(localStorage.getItem('homesync-theme')==='light'){document.body.classList.add('light');}}catch(e){}})();</script>
+
+<button id="theme-toggle" class="theme-toggle theme-toggle-fixed" type="button" title="Toggle theme" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+
+<div class="auth-shell">
+  <div class="wrap" style="max-width:420px;">
+    <div class="card auth-card">
+      <div class="center" style="margin-bottom:18px;">
+        <span class="pill" style="background:rgba(249,115,22,0.14); color:var(--gold);">🔒 Admin Portal</span>
+      </div>
+      <h2 class="center" style="margin-bottom:6px;">HomeSync AI — Admin</h2>
+      <p class="center muted" style="margin-bottom:26px;">Restricted access. Sign in with your admin account.</p>
+
+      <div id="admin-msg" class="msg hidden"></div>
+
+      <form id="admin-login-form" novalidate>
+        <label for="admin-email">Admin email</label>
+        <input type="email" id="admin-email" placeholder="admin@homesync.ai" autocomplete="email" required />
+
+        <label for="admin-password">Password</label>
+        <input type="password" id="admin-password" placeholder="••••••••" autocomplete="current-password" required />
+
+        <button type="submit" id="admin-login-btn" class="btn btn-primary btn-block">Sign in to Admin Portal</button>
+      </form>
+
+      <p class="center muted" style="margin-top:22px; font-size:0.82rem;">
+        Not an admin? <a href="login.html">Go to regular sign in</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/admin-auth.js"></script>
+</body>
+</html>

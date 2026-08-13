@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /onboarding.html
+Disallow: /dashboard.html
+Disallow: /profile.html
+
+Sitemap: https://homesync.ai/sitemap.xml

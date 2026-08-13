@@ -1,257 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<style id="auth-gate">html{visibility:hidden}</style>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smitten — Profile</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/profile.css">
-<script src="assets/js/supabase-config.js"></script>
-<script src="assets/js/vendor/supabase.js"></script>
-<script src="assets/js/supabase-client.js"></script>
-<script src="assets/js/auth.js"></script>
-<script src="assets/js/ui-helpers.js"></script>
-<script src="assets/js/api.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My account — HomeSync AI</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/png" href="assets/favicon-64.png" />
 </head>
 <body>
-<script>AUTH.requireAuth();</script>
+<script>(function(){try{if(localStorage.getItem('homesync-theme')==='light'){document.body.classList.add('light');}}catch(e){}})();</script>
 
-<svg style="position:absolute;width:0;height:0;"><defs>
-  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
-</defs></svg>
-
-<div class="ambient"><div class="blob b1"></div><div class="blob b2"></div></div>
-
-<nav class="app-nav">
-  <div class="brand"><svg viewBox="0 0 100 92" style="width:18px;height:18px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten</div>
-  <div class="links">
-    <a href="dashboard.html">My Notes</a>
-    <a href="invitations.html">All Notes</a>
-    <a href="templates.html">Templates</a>
-    <a href="studio.html">Studio</a>
-    <a class="current" href="#">Profile</a>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div>
+    <button id="nav-toggle" class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="nav-links">
+      <button id="theme-toggle" class="theme-toggle" type="button" title="Toggle theme" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+      <a href="dashboard.html">Matches</a>
+      <a href="#" id="logout-btn-top" class="btn btn-ghost">Sign out</a>
+    </div>
   </div>
-  <div class="avatar-nav"></div>
 </nav>
 
-<div class="wrap">
-  <div class="page-head">
-    <div class="eyebrow">your profile</div>
-    <h1>You, on Smitten.</h1>
-    <p>This is what people see when you send them a note.</p>
-  </div>
+<section class="wrap section-tight">
+  <span class="eyebrow">Account</span>
+  <h2 style="margin-bottom:24px;">My account</h2>
 
-  <div id="profile-load-state">⏳ Loading your profile…</div>
+  <div id="account-msg" class="msg hidden"></div>
 
-  <div id="profile-content" style="display:none;">
-    <div class="id-card">
-      <div class="avatar-upload">
-        <span class="cam" id="avatar-initials">📷</span>
-        <span class="badge">✏️</span>
-      </div>
-      <div class="id-info">
-        <h2 id="id-name">—</h2>
-        <p id="id-contact">—</p>
-        <span class="verified-tag" id="id-verified"></span>
-      </div>
-      <a href="settings.html" class="pill-btn ghost">App settings</a>
+  <div class="account-shell">
+    <!-- Left nav -->
+    <div class="account-nav">
+      <a href="#profile" class="active">Profile</a>
+      <a href="#notifications">Notifications</a>
+      <a href="#security">Security</a>
+      <a href="#support">Support</a>
+      <a href="#legal">Legal</a>
+      <a href="#app">App</a>
+      <a href="#account-actions">Account actions</a>
     </div>
 
-    <div class="stats-row">
-      <div class="stat-card"><div class="n" id="stat-sent">0</div><div class="l">Notes sent</div></div>
-      <div class="stat-card"><div class="n" id="stat-opened">0</div><div class="l">Opened</div></div>
-      <div class="stat-card"><div class="n" id="stat-yes">0</div><div class="l">Said yes</div></div>
-    </div>
+    <!-- Right content -->
+    <div>
 
-    <form class="form-card" id="basic-form">
-      <div class="form-head">
-        <h3>Basic details</h3>
-        <span class="tag-req">Required to publish notes</span>
-      </div>
-      <div class="form-error" id="basic-error" style="display:none;color:#C92A2A;font-size:12.5px;margin-bottom:10px;"></div>
-      <div class="field-grid">
-        <div class="field">
-          <label>Full name</label>
-          <input type="text" id="full_name" placeholder="Your full name" required>
-        </div>
-        <div class="field">
-          <label>Display name <span class="opt">shown to recipients</span></label>
-          <input type="text" id="display_name" placeholder="What should they call you?">
-        </div>
-        <div class="field">
-          <label>Email address</label>
-          <input type="email" id="email" placeholder="you@email.com" disabled style="opacity:.65;">
-        </div>
-        <div class="field">
-          <label>Mobile number</label>
-          <input type="tel" id="mobile" placeholder="+91 98765 43210">
-        </div>
-      </div>
-      <div class="form-actions">
-        <button class="pill-btn ghost" type="button" id="basic-cancel">Cancel</button>
-        <button class="pill-btn pink sticker-shadow-sm" type="submit">Save changes</button>
-      </div>
-    </form>
+      <!-- Profile -->
+      <div class="card account-section" id="profile">
+        <h3>Profile</h3>
+        <p class="muted">Shown to people you match with.</p>
 
-    <form class="form-card" id="more-form">
-      <div class="form-head">
-        <h3>A little more about you</h3>
-        <span class="tag-req" style="background:var(--mint-soft);color:#1F8E68;">Optional</span>
-      </div>
-      <div class="field-grid">
-        <div class="field">
-          <label>Instagram <span class="opt">optional</span></label>
-          <div class="prefix-wrap">
-            <span>@</span>
-            <input type="text" id="instagram" placeholder="yourhandle">
+        <div class="avatar-row">
+          <div class="avatar-lg" id="profile-avatar">?</div>
+          <div style="flex:1;">
+            <label style="margin-bottom:4px;">Profile photo</label>
+            <input type="file" id="photo-file" accept="image/png,image/jpeg,image/webp" style="margin-bottom:6px;" />
+            <p class="field-hint" id="photo-upload-hint" style="margin:0;">JPG, PNG, or WEBP — up to 5MB.</p>
+            <input type="hidden" id="photo_url" />
           </div>
         </div>
-        <div class="field">
-          <label>Where you're based <span class="opt">optional</span></label>
-          <input type="text" id="location" placeholder="City, country">
-        </div>
-        <div class="field full">
-          <label>Short bio <span class="opt">optional</span></label>
-          <textarea id="bio" maxlength="140" placeholder="A line or two — this shows up on notes that include your intro."></textarea>
-          <span class="hint">Keep it under 140 characters — short and sweet reads best.</span>
-        </div>
-      </div>
-      <div class="form-actions">
-        <button class="pill-btn ghost" type="button" id="more-cancel">Cancel</button>
-        <button class="pill-btn pink sticker-shadow-sm" type="submit">Save changes</button>
-      </div>
-    </form>
 
-    <div class="danger-card">
-      <div>
-        <h3>Delete account</h3>
-        <p>This removes your profile and every note you've sent. There's no undoing it.</p>
-      </div>
-      <button class="pill-btn danger" id="delete-account-btn">Delete my account</button>
-    </div>
+        <label for="profile-full-name">Full name</label>
+        <input type="text" id="profile-full-name" />
 
-    <div class="logout-row">
-      <a href="admin.html" id="admin-link" style="color:var(--ink-soft);display:none;">Admin portal →</a>
-      <span id="admin-sep" style="display:none;">&nbsp;·&nbsp;</span>
-      <a href="#" id="logout-link">Log out</a>
+        <label for="profile-email">Email address</label>
+        <input type="email" id="profile-email" disabled />
+        <p class="field-hint">Your login email — change it under Security.</p>
+
+        <label for="profile-mobile">Mobile number</label>
+        <input type="tel" id="profile-mobile" placeholder="e.g. 9876543210" />
+        <p class="field-hint">Shown to matches so they can reach you on WhatsApp.</p>
+
+        <label for="profile-dob">Date of birth (optional)</label>
+        <input type="date" id="profile-dob" />
+
+        <button id="save-profile-basics-btn" class="btn btn-primary">Save changes</button>
+      </div>
+
+      <!-- Notifications -->
+      <div class="card account-section" id="notifications">
+        <h3>Notifications</h3>
+        <p class="muted">Choose what HomeSync AI can notify you about.</p>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-row-label">New match alerts</div>
+            <div class="toggle-row-hint">Get notified when a strong new compatibility match appears.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="notif-match-alerts" />
+            <span class="switch-track"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-row-label">Email updates</div>
+            <div class="toggle-row-hint">Product updates and occasional emails from the team.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="notif-email-updates" />
+            <span class="switch-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Security -->
+      <div class="card account-section" id="security">
+        <h3>Security</h3>
+        <p class="muted">Manage how you sign in.</p>
+
+        <label for="new-password">New password</label>
+        <input type="password" id="new-password" placeholder="At least 8 characters" minlength="8" />
+        <button id="change-password-btn" class="btn btn-ghost" style="margin-bottom:8px;">Update password</button>
+        <p class="field-hint" style="margin-top:8px;">Leave blank if you don't want to change it.</p>
+
+        <hr class="divider" style="margin:20px 0;" />
+        <button id="logout-all-btn" class="btn btn-ghost">Sign out of all devices</button>
+      </div>
+
+      <!-- Support -->
+      <div class="card account-section" id="support">
+        <h3>Support</h3>
+        <p class="muted">We're a small student team — reach out any time.</p>
+        <div class="link-list">
+          <a href="mailto:support@homesync.ai">Contact us <span>→</span></a>
+          <a href="#faq">FAQs <span>→</span></a>
+        </div>
+      </div>
+
+      <!-- Legal -->
+      <div class="card account-section" id="legal">
+        <h3>Legal</h3>
+        <div class="link-list">
+          <a href="legal.html#privacy" target="_blank">Privacy Policy <span>→</span></a>
+          <a href="legal.html#terms" target="_blank">Terms &amp; Conditions <span>→</span></a>
+          <a href="legal.html#disclaimer" target="_blank">Disclaimer <span>→</span></a>
+        </div>
+      </div>
+
+      <!-- App -->
+      <div class="card account-section" id="app">
+        <h3>App</h3>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-row-label">Light mode</div>
+            <div class="toggle-row-hint">Switch to a bright, cream color scheme.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <span class="switch-track"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-row-label">App version</div>
+          <div class="toggle-row-hint">B.Tech Project-II prototype · v0.1</div>
+        </div>
+      </div>
+
+      <!-- Account actions -->
+      <div class="card account-section danger-zone" id="account-actions">
+        <h3>Account actions</h3>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
+          <button id="logout-btn-bottom" class="btn btn-ghost">Log out</button>
+          <button id="delete-account-btn" class="btn btn-danger">Delete account</button>
+        </div>
+        <p class="field-hint" style="margin-top:12px;">
+          Deleting your account removes your profile and matches permanently. This can't be undone.
+        </p>
+      </div>
+
     </div>
   </div>
-</div>
+</section>
 
-<script>
-let PROFILE = null;
+<footer>
+  <div class="wrap footer-inner">
+    <span>© 2026 HomeSync AI — B.Tech Project-II prototype</span>
+    <span>Aniket · Anchal Garg · Anant Saxena · Ayush Chauhan</span>
+  </div>
+</footer>
 
-function fillForm(p) {
-  document.getElementById("full_name").value = p.full_name || "";
-  document.getElementById("display_name").value = p.display_name || "";
-  document.getElementById("email").value = p.users?.email || "";
-  document.getElementById("mobile").value = p.users?.mobile || "";
-  document.getElementById("instagram").value = p.instagram || "";
-  document.getElementById("location").value = p.location || "";
-  document.getElementById("bio").value = p.bio || "";
-
-  document.getElementById("id-name").textContent = p.full_name || "Your name";
-  document.getElementById("id-contact").textContent = [p.users?.email, p.users?.mobile].filter(Boolean).join(" · ");
-  document.getElementById("avatar-initials").textContent = UI.initials(p.full_name);
-  const verifiedEl = document.getElementById("id-verified");
-  if (p.users?.email_verified) { verifiedEl.textContent = "✓ Verified account"; verifiedEl.style.display = ""; }
-  else verifiedEl.style.display = "none";
-}
-
-async function loadProfile() {
-  const loadState = document.getElementById("profile-load-state");
-  const content = document.getElementById("profile-content");
-  try {
-    const [profile, stats, session] = await Promise.all([
-      API.getMyProfile(), API.myInvitationStats(), AUTH.getSession(),
-    ]);
-    PROFILE = profile;
-    fillForm(profile || {});
-    document.getElementById("stat-sent").textContent = stats.sent;
-    document.getElementById("stat-opened").textContent = stats.opened;
-    document.getElementById("stat-yes").textContent = stats.accepted;
-
-    const admin = await AUTH.isAdmin(session.user.id);
-    if (admin) {
-      document.getElementById("admin-link").style.display = "";
-      document.getElementById("admin-sep").style.display = "";
-    }
-
-    loadState.style.display = "none";
-    content.style.display = "";
-  } catch (err) {
-    loadState.innerHTML = UI.errorBlock(UI.friendlyError(err), loadProfile);
-  }
-}
-loadProfile();
-
-document.getElementById("basic-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const errEl = document.getElementById("basic-error");
-  errEl.style.display = "none";
-  const btn = e.target.querySelector('button[type="submit"]');
-  const original = btn.textContent;
-  btn.disabled = true; btn.textContent = "Saving…";
-  try {
-    const full_name = document.getElementById("full_name").value.trim();
-    const display_name = document.getElementById("display_name").value.trim() || null;
-    const mobile = document.getElementById("mobile").value.trim() || null;
-    if (!full_name) throw new Error("Full name is required.");
-    await API.upsertMyProfile({ full_name, display_name });
-    const user = await AUTH.getUser();
-    const { error } = await sb.from("users").update({ mobile }).eq("id", user.id);
-    if (error) throw error;
-    UI.toast("Profile updated", "success");
-    loadProfile();
-  } catch (err) {
-    errEl.textContent = UI.friendlyError(err);
-    errEl.style.display = "";
-  } finally {
-    btn.disabled = false; btn.textContent = original;
-  }
-});
-document.getElementById("basic-cancel").addEventListener("click", () => fillForm(PROFILE || {}));
-
-document.getElementById("more-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const btn = e.target.querySelector('button[type="submit"]');
-  const original = btn.textContent;
-  btn.disabled = true; btn.textContent = "Saving…";
-  try {
-    await API.upsertMyProfile({
-      full_name: PROFILE?.full_name || document.getElementById("full_name").value.trim() || "New Smitten user",
-      instagram: document.getElementById("instagram").value.trim() || null,
-      location: document.getElementById("location").value.trim() || null,
-      bio: document.getElementById("bio").value.trim() || null,
-    });
-    UI.toast("Profile updated", "success");
-    loadProfile();
-  } catch (err) {
-    UI.toast(UI.friendlyError(err), "error");
-  } finally {
-    btn.disabled = false; btn.textContent = original;
-  }
-});
-document.getElementById("more-cancel").addEventListener("click", () => fillForm(PROFILE || {}));
-
-document.getElementById("delete-account-btn").addEventListener("click", async () => {
-  if (!confirm("This permanently deletes your account and every note you've sent. This can't be undone. Continue?")) return;
-  if (!confirm("Really sure? Type OK to confirm one final time.")) return;
-  try {
-    await API.deleteMyAccount();
-    window.location.href = "index.html";
-  } catch (err) {
-    UI.toast(UI.friendlyError(err), "error");
-  }
-});
-
-document.getElementById("logout-link").addEventListener("click", function (e) {
-  e.preventDefault();
-  AUTH.signOut();
-});
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/profile.js"></script>
 </body>
 </html>

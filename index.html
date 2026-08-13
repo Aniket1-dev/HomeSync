@@ -1,49 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smitten — Turn a plan into a private little moment</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/index.css">
-<script src="assets/js/supabase-config.js"></script>
-<script src="assets/js/vendor/supabase.js"></script>
-<script src="assets/js/supabase-client.js"></script>
-<script src="assets/js/auth.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HomeSync AI — Find a roommate who actually fits</title>
+<meta name="description" content="HomeSync AI matches roommates on how they actually live — sleep schedule, cleanliness, budget, and personality — not just where they want to live. Free B.Tech Project-II prototype." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://homesync.ai/" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="HomeSync AI" />
+<meta property="og:title" content="HomeSync AI — Find a roommate who actually fits" />
+<meta property="og:description" content="Structured compatibility scoring for roommates — sleep, cleanliness, budget, and personality, ranked in one transparent score." />
+<meta property="og:image" content="https://homesync.ai/assets/og-image.png" />
+<meta property="og:url" content="https://homesync.ai/" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="HomeSync AI — Find a roommate who actually fits" />
+<meta name="twitter:description" content="Structured compatibility scoring for roommates — sleep, cleanliness, budget, and personality, ranked in one transparent score." />
+<meta name="twitter:image" content="https://homesync.ai/assets/og-image.png" />
+
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/png" href="assets/favicon-64.png" />
+<link rel="apple-touch-icon" href="assets/favicon-64.png" />
 </head>
 <body>
-<svg style="position:absolute;width:0;height:0;"><defs>
-  <symbol id="d-heart" viewBox="0 0 100 92"><path d="M50 88 C15 62 4 40 12 24 C19 10 40 8 50 24 C60 8 81 10 88 24 C96 40 85 62 50 88 Z"/></symbol>
-</defs></svg>
-<div class="ambient"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
-<div class="brand"><svg viewBox="0 0 100 92" style="width:20px;height:20px;stroke:var(--pink);stroke-width:8;fill:none;"><use href="#d-heart"/></svg>Smitten</div>
-<div class="wrap">
-  <div class="hero">
-    <div class="eyebrow">a private way to plan a date</div>
-    <h1>Turn the plan into<br>a little <em>moment.</em></h1>
-    <p>Write a note, pick the date and place, send a private link. They open it, they answer, you both get the plan.</p>
-    <div class="heart-strip">
-      <svg viewBox="0 0 100 92"><use href="#d-heart"/></svg>
-      <svg viewBox="0 0 100 92"><use href="#d-heart"/></svg>
-      <svg viewBox="0 0 100 92"><use href="#d-heart"/></svg>
-    </div>
-    <div class="cta-row" id="cta-row">
-      <a href="signup.html" class="pill-btn pink sticker-shadow-sm">Get started →</a>
-      <a href="login.html" class="pill-btn paper sticker-shadow-sm">I already have an account</a>
+<script>(function(){try{if(localStorage.getItem('homesync-theme')==='light'){document.body.classList.add('light');}}catch(e){}})();</script>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div>
+    <button id="nav-toggle" class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="nav-links">
+      <button id="theme-toggle" class="theme-toggle" type="button" title="Toggle theme" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+      <a href="#how-it-works">How it works</a>
+      <a href="#team">Team</a>
+      <a href="login.html" class="btn btn-ghost">Sign in</a>
     </div>
   </div>
-</div>
-<footer class="site-foot">made with 💛 for someone special</footer>
+</nav>
+
+<header class="wrap hero">
+  <div>
+    <span class="eyebrow">Roommate matching, not property listing</span>
+    <h1>Find a roommate whose <em>rhythm</em> actually syncs with yours.</h1>
+    <p style="font-size:1.08rem; max-width:46ch;">
+      HomeSync AI scores compatibility across sleep schedule, cleanliness, budget and
+      personality — then reads your bio to catch what a form never could.
+      One score. Full transparency on how we got there.
+    </p>
+    <div style="display:flex; gap:14px; margin-top:24px; flex-wrap:wrap;">
+      <a href="login.html" class="btn btn-primary">Get started free</a>
+      <a href="#how-it-works" class="btn btn-ghost">See how matching works</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div id="hero-dial" style="--dial-size:220px;"></div>
+  </div>
+</header>
+
+<section class="section-tight wrap">
+  <hr class="divider" />
+</section>
+
+<section class="wrap section-tight" id="problem">
+  <span class="eyebrow">The problem</span>
+  <h2 style="max-width:24ch;">Listing sites match you to a property. Nobody matches you to a person.</h2>
+  <p style="max-width:60ch;">
+    Most flatmate mismatches don't come from the flat — they come from sleep schedules,
+    cleanliness habits and unspoken expectations that never come up until move-in day.
+    HomeSync AI treats the person-to-person fit as the primary product, not a checkbox filter.
+  </p>
+</section>
+
+<section class="wrap section-tight" id="how-it-works">
+  <span class="eyebrow">How matching works</span>
+  <h2>A hybrid score: structured, then explained.</h2>
+  <div class="grid-3" style="margin-top:28px;">
+    <div class="card feature-card">
+      <div class="feature-num">Rule-based</div>
+      <h3>Structured fit</h3>
+      <p>Sleep schedule, cleanliness, budget, guest habits and conflict style are weighted
+      and scored numerically — cheap, fast, fully explainable.</p>
+    </div>
+    <div class="card feature-card">
+      <div class="feature-num">LLM-based</div>
+      <h3>Bio understanding</h3>
+      <p>Your free-text bio is read for nuance a form can't capture — like "I work night
+      shifts and need daytime quiet" — and scored with a one-line justification.</p>
+    </div>
+    <div class="card feature-card">
+      <div class="feature-num">Hybrid</div>
+      <h3>One transparent score</h3>
+      <p>Both signals combine into a single compatibility score, with the full breakdown
+      always visible — never a black box.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap section-tight" id="team">
+  <span class="eyebrow">B.Tech Project-II · CSE (Data Science), Batch 2025–29</span>
+  <h2>Built by</h2>
+  <div class="grid-3" style="margin-top:20px;">
+    <div class="card team-card">
+      <div class="avatar" style="background:#10B981;">AN</div>
+      <h3 style="margin-bottom:2px;">Aniket</h3>
+      <div class="team-role">Project lead</div>
+    </div>
+    <div class="card team-card">
+      <div class="avatar" style="background:#3B82F6;">AG</div>
+      <h3 style="margin-bottom:2px;">Anchal Garg</h3>
+      <div class="team-role">Team member</div>
+    </div>
+    <div class="card team-card">
+      <div class="avatar" style="background:#F97316;">AS</div>
+      <h3 style="margin-bottom:2px;">Anant Saxena</h3>
+      <div class="team-role">Team member</div>
+    </div>
+    <div class="card team-card">
+      <div class="avatar" style="background:#8B5CF6;">AC</div>
+      <h3 style="margin-bottom:2px;">Ayush Chauhan</h3>
+      <div class="team-role">Team member</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="login">
+  <div class="wrap">
+    <div class="card" style="text-align:center; padding:56px 32px; position:relative; overflow:hidden;">
+      <span class="eyebrow">Ready when you are</span>
+      <h2 style="max-width:26ch; margin-left:auto; margin-right:auto;">Your next roommate is one score away.</h2>
+      <p style="max-width:48ch; margin:0 auto 26px;">
+        Sign in with Google or email — takes under a minute to set up your lifestyle profile
+        and start seeing ranked matches.
+      </p>
+      <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+        <a href="login.html" class="btn btn-primary">Get started free</a>
+        <a href="login.html" class="btn btn-ghost">Sign in</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div>
+        <div class="brand" style="margin-bottom:10px;"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div>
+        <p style="max-width:32ch; margin:0;">Roommate matching for students, scored on how you actually live — not just where you want to live.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="index.html#how-it-works">How it works</a>
+          <a href="index.html#team">Team</a>
+          <a href="login.html">Sign in</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="about.html">About</a>
+          <a href="contact.html">Contact</a>
+          <a href="faq.html">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="legal.html#privacy">Privacy Policy</a>
+          <a href="legal.html#terms">Terms &amp; Conditions</a>
+          <a href="legal.html#disclaimer">Disclaimer</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 HomeSync AI — B.Tech Project-II prototype</span>
+      <span>Aniket · Anchal Garg · Anant Saxena · Ayush Chauhan</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/theme.js"></script>
 <script>
-(async function () {
-  const session = await AUTH.getSession();
-  if (session) {
-    document.getElementById("cta-row").innerHTML =
-      '<a href="dashboard.html" class="pill-btn pink sticker-shadow-sm">Go to my notes →</a>';
-  }
-})();
+  renderSyncDial(document.getElementById("hero-dial"), 87, { size: 220, label: "Compatibility" });
+
+  // If already signed in, skip the marketing page entirely.
+  supabaseClient.auth.getSession().then(({ data }) => {
+    if (data.session) {
+      supabaseClient
+        .from("profiles")
+        .select("id, is_admin")
+        .eq("id", data.session.user.id)
+        .maybeSingle()
+        .then(({ data: profile }) => {
+          if (profile?.is_admin) window.location.href = "admin.html";
+          else if (profile) window.location.href = "dashboard.html";
+        });
+    }
+  });
 </script>
 </body>
 </html>
