@@ -113,6 +113,27 @@ function goToStep(step) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function mapCompatibilityToLegacyProfile(compatibility) {
+  const a = compatibility?.answers || {};
+  const value = (key) => a[key] == null ? null : Number(a[key]) + 1;
+
+  const sleep = value("sleep_time");
+  const clean = value("clean_room");
+  const guests = value("guest_frequency");
+  const personality = value("social_energy");
+  const conflictIndex = a.noise_conflict == null ? null : Number(a.noise_conflict);
+  const smokingIndex = a.smoking_home == null ? null : Number(a.smoking_home);
+
+  return {
+    sleep_schedule: sleep,
+    cleanliness: clean,
+    guest_frequency: guests,
+    personality,
+    conflict_style: conflictIndex == null ? null : (conflictIndex === 0 ? "avoids" : conflictIndex === 1 ? "discusses" : "confronts"),
+    smoking_drinking: smokingIndex == null ? null : (smokingIndex === 0 ? "never" : smokingIndex === 3 ? "regular" : "social"),
+  };
+}
+
 async function handleSubmit(e) {
   e.preventDefault();
   if (!validateStep(4)) return;
@@ -123,6 +144,8 @@ async function handleSubmit(e) {
   hideMsg(msg);
 
   const data = Object.fromEntries(new FormData(form).entries());
+  const compatibility = window.homesyncCompatibilityAnswers || null;
+  const legacy = mapCompatibilityToLegacyProfile(compatibility);
 
   const payload = {
     id: currentUser.id,
@@ -136,13 +159,15 @@ async function handleSubmit(e) {
     preferred_area: data.preferred_area,
     budget_min: parseInt(data.budget_min, 10),
     budget_max: parseInt(data.budget_max, 10),
-    sleep_schedule: parseInt(data.sleep_schedule, 10),
-    cleanliness: parseInt(data.cleanliness, 10),
-    guest_frequency: parseInt(data.guest_frequency, 10),
-    personality: parseInt(data.personality, 10),
-    smoking_drinking: data.smoking_drinking,
-    cooking_habits: data.cooking_habits,
-    conflict_style: data.conflict_style,
+    sleep_schedule: legacy.sleep_schedule ?? null,
+    cleanliness: legacy.cleanliness ?? null,
+    guest_frequency: legacy.guest_frequency ?? null,
+    personality: legacy.personality ?? null,
+    smoking_drinking: legacy.smoking_drinking,
+    cooking_habits: data.cooking_habits || null,
+    conflict_style: legacy.conflict_style,
+    compatibility_answers: compatibility?.answers || {},
+    compatibility_dealbreakers: compatibility?.dealbreakers || [],
     bio: data.bio,
     updated_at: new Date().toISOString(),
   };
@@ -157,8 +182,6 @@ async function handleSubmit(e) {
     return;
   }
 
-  // Persist the full 15-question compatibility profile separately from the public profile.
-  const compatibility = window.homesyncCompatibilityAnswers;
   if (compatibility) {
     const { error: questionnaireError } = await supabaseClient
       .from("roommate_questionnaire")
