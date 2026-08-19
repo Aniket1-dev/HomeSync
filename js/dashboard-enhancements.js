@@ -6,16 +6,19 @@
   async function init() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return;
-    const { data: profile, error } = await supabaseClient.from('profiles').select('id,full_name,photo_url,is_premium,city,preferred_area').eq('id', user.id).maybeSingle();
+    const { data: profile, error } = await supabaseClient.from('profiles').select('id,full_name,photo_url,is_premium,premium_since,city,preferred_area').eq('id', user.id).maybeSingle();
     if (error || !profile) return;
+
+    // Treat a recorded premium activation as Premium too. This keeps the UI correct
+    // if an older row has premium_since set but is_premium was not synchronized.
+    profile.is_premium = profile.is_premium === true || Boolean(profile.premium_since);
 
     // Reconcile the banner from a fresh database read. Never show an upgrade CTA to Premium users.
     const banner = document.getElementById('premium-banner');
-    const btn = document.getElementById('premium-banner-btn');
-    if (banner && profile.is_premium === true) {
+    if (banner && profile.is_premium) {
       banner.classList.add('is-premium','hs-premium-hide');
       banner.setAttribute('aria-hidden','true');
-    } else if (banner && profile.is_premium !== true) {
+    } else if (banner) {
       banner.classList.remove('hs-premium-hide');
     }
 
@@ -62,6 +65,7 @@
   }
 
   async function geocode(query) {
+    if (!query) return null;
     try {
       const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`;
       const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
@@ -76,7 +80,7 @@
     if (!el) return;
     try { await loadLeaflet(); } catch { el.innerHTML = '<div style="padding:24px;color:var(--ink-soft)">Map could not be loaded right now.</div>'; return; }
 
-    const { data: profiles } = await supabaseClient.from('profiles').select('id,full_name,city,preferred_area,is_premium').neq('id', userId).limit(30);
+    const { data: profiles } = await supabaseClient.from('profiles').select('id,full_name,city,preferred_area,is_premium,premium_since').neq('id', userId).limit(30);
     const points = [];
     const mePoint = await geocode([me.preferred_area, me.city].filter(Boolean).join(', '));
     if (mePoint) points.push({ coords: mePoint, name: 'You', own: true });
@@ -87,7 +91,7 @@
       if (!query || seen.has(query.toLowerCase())) continue;
       seen.add(query.toLowerCase());
       const coords = await geocode(query);
-      if (coords) points.push({ coords, name: p.full_name || 'Roommate match', premium: p.is_premium });
+      if (coords) points.push({ coords, name: p.full_name || 'Roommate match', premium: p.is_premium === true || Boolean(p.premium_since) });
       if (points.length >= 12) break;
     }
 
