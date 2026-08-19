@@ -1,11 +1,10 @@
 // Onboarding wizard: 4-step form that writes the structured profile
-// (Section 3.2 of the report) to Supabase.
+// and the 15-question lifestyle compatibility profile to Supabase.
 
 let currentUser = null;
 let currentStep = 1;
 const TOTAL_STEPS = 4;
 
-// Fields required to advance out of each step
 const STEP_REQUIRED_FIELDS = {
   1: ["full_name"],
   2: ["city", "budget_min", "budget_max"],
@@ -30,7 +29,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = "login.html";
   });
 
-  // Prefill the form if a profile already exists (edit mode)
   const { data: existing } = await supabaseClient
     .from("profiles")
     .select("*")
@@ -47,15 +45,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Wire up range slider live values
   document.querySelectorAll('input[type="range"]').forEach((range) => {
     const out = document.getElementById(range.id + "-val");
+    if (!out) return;
     const update = () => (out.textContent = range.value);
     range.addEventListener("input", update);
     update();
   });
 
-  // Wizard navigation
   document.querySelectorAll(".wizard-next").forEach((btn) => {
     btn.addEventListener("click", () => {
       if (!validateStep(currentStep)) return;
@@ -154,12 +151,33 @@ async function handleSubmit(e) {
 
   const { error } = await supabaseClient.from("profiles").upsert(payload);
 
-  setLoading(btn, false, "Save & see matches ✓");
-
   if (error) {
+    setLoading(btn, false, "Save & see matches ✓");
     showMsg(msg, error.message);
     return;
   }
 
+  // Persist the full 15-question compatibility profile separately from the public profile.
+  const compatibility = window.homesyncCompatibilityAnswers;
+  if (compatibility) {
+    const { error: questionnaireError } = await supabaseClient
+      .from("roommate_questionnaire")
+      .upsert({
+        user_id: currentUser.id,
+        answers: compatibility.answers || {},
+        dealbreakers: compatibility.dealbreakers || [],
+        compatibility_version: compatibility.version || 1,
+        completed_at: compatibility.completed_at || new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
+    if (questionnaireError) {
+      setLoading(btn, false, "Save & see matches ✓");
+      showMsg(msg, "Profile saved, but compatibility answers could not be saved: " + questionnaireError.message);
+      return;
+    }
+  }
+
+  setLoading(btn, false, "Save & see matches ✓");
   window.location.href = "dashboard.html";
 }
