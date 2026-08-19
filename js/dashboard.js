@@ -1,4 +1,8 @@
-// Dashboard: loads profiles, ranks matches client-side, renders results.
+// Dashboard workspace UI is intentionally injected here so older deployed dashboard HTML also receives it.
+document.addEventListener("DOMContentLoaded",()=>{const link=document.createElement("link");link.rel="stylesheet";link.href="css/dashboard-workspace.css?v=20260820-2";document.head.appendChild(link);const script=document.createElement("script");script.src="js/dashboard-workspace.js?v=20260820-2";document.body.appendChild(script);});
+// Hide the legacy sidebar even if an older dashboard HTML is cached.
+document.addEventListener("DOMContentLoaded",()=>{document.querySelectorAll(".dash-sidebar").forEach(el=>el.remove());});
+
 let me = null;
 let rankedMatches = [];
 let currentSort = "score";
