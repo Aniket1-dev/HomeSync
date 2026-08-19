@@ -1,0 +1,38 @@
+/* HomeSync dashboard — light-mode visual refinement */
+body.light .dash-banner {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0FAF5 58%, #E8F7F0 100%);
+  border: 1px solid #CFE2D8;
+  box-shadow: 0 10px 30px rgba(24, 33, 31, 0.07);
+}
+
+body.light .dash-banner::after {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.14), transparent 68%);
+}
+
+body.light .dash-banner-text h2 {
+  color: #18211F;
+}
+
+body.light .dash-banner-text p {
+  color: #61706A;
+}
+
+body.light .dash-banner .eyebrow {
+  background: #DFF4E9;
+  color: #078A62;
+}
+
+body.light .dash-banner .btn-ghost {
+  color: #26332F;
+  border-color: #C9D8D1;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+body.light .dash-banner .btn-ghost:hover {
+  background: #FFFFFF;
+  border-color: #AFC8BD;
+}
+
+body.light .dash-banner .btn-primary {
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.20);
+}
