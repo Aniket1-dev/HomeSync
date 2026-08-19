@@ -4,11 +4,12 @@
   "private": true,
   "description": "HomeSync AI roommate matching application",
   "scripts": {
-    "mobile:sync": "npx cap sync",
-    "mobile:android": "npx cap open android",
-    "mobile:ios": "npx cap open ios",
-    "mobile:android:build": "npx cap sync android && cd android && ./gradlew assembleDebug",
-    "mobile:ios:sync": "npx cap sync ios"
+    "mobile:prepare": "node scripts/prepare-mobile.mjs",
+    "mobile:sync": "npm run mobile:prepare && npx cap sync",
+    "mobile:android": "npm run mobile:prepare && npx cap sync android && npx cap open android",
+    "mobile:ios": "npm run mobile:prepare && npx cap sync ios && npx cap open ios",
+    "mobile:android:build": "npm run mobile:prepare && npx cap sync android && cd android && ./gradlew assembleDebug",
+    "mobile:ios:sync": "npm run mobile:prepare && npx cap sync ios"
   },
   "dependencies": {
     "@capacitor/core": "^8.5.0",
