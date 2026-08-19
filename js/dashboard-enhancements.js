@@ -1,93 +1,28 @@
-/* HomeSync dashboard enhancements: authoritative premium state, account pill, map. */
+/* HomeSync dashboard enhancements: premium state, account pill, reliable theme-aware map. */
 (() => {
-  const esc = (v) => String(v ?? '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
-  const initials = (name) => (String(name || 'U').trim().split(/\s+/).slice(0,2).map(x => x[0]).join('').toUpperCase() || 'U');
-  let mapInstance = null;
-  let tileLayer = null;
-  let mapPoints = [];
-
-  async function init() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) return;
-    const { data: profile, error } = await supabaseClient.from('profiles').select('id,full_name,photo_url,is_premium,premium_since,city,preferred_area').eq('id', user.id).maybeSingle();
-    if (error || !profile) return;
-    profile.is_premium = profile.is_premium === true || Boolean(profile.premium_since);
-    const banner = document.getElementById('premium-banner');
-    if (banner && profile.is_premium) { banner.classList.add('is-premium','hs-premium-hide'); banner.setAttribute('aria-hidden','true'); }
-    else if (banner) banner.classList.remove('hs-premium-hide');
-    renderAccountPill(profile);
-    renderMapShell();
-    await loadMap(profile, user.id);
-    observeThemeChanges();
+  const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+  const initials=n=>(String(n||'U').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'U');
+  let mapInstance=null,tileLayer=null;
+  async function init(){
+    const {data:{user}}=await supabaseClient.auth.getUser(); if(!user)return;
+    const {data:profile,error}=await supabaseClient.from('profiles').select('id,full_name,photo_url,is_premium,premium_since,city,preferred_area,location_latitude,location_longitude').eq('id',user.id).maybeSingle();
+    if(error||!profile)return; profile.is_premium=profile.is_premium===true||Boolean(profile.premium_since);
+    const banner=document.getElementById('premium-banner'); if(banner&&profile.is_premium){banner.classList.add('is-premium','hs-premium-hide');banner.setAttribute('aria-hidden','true');}
+    renderAccountPill(profile); renderMapShell(); await loadMap(profile,user.id); observeThemeChanges();
   }
-
-  function renderAccountPill(profile) {
-    if (document.getElementById('hs-account-pill')) return;
-    const a = document.createElement('a'); a.id='hs-account-pill'; a.className='hs-account-pill'; a.href='profile.html';
-    const avatar = profile.photo_url ? `<img src="${esc(profile.photo_url)}" alt="">` : esc(initials(profile.full_name));
-    const plan = profile.is_premium ? '⭐ Premium' : 'Free plan';
-    a.innerHTML=`<span class="hs-account-avatar">${avatar}</span><span class="hs-account-meta"><span class="hs-account-name">${esc(profile.full_name || 'Your account')}</span><span class="hs-account-plan ${profile.is_premium?'premium':''}">${plan}</span></span>`;
-    document.body.appendChild(a);
+  function renderAccountPill(p){if(document.getElementById('hs-account-pill'))return;const a=document.createElement('a');a.id='hs-account-pill';a.className='hs-account-pill';a.href='profile.html';const av=p.photo_url?`<img src="${esc(p.photo_url)}" alt="">`:esc(initials(p.full_name));a.innerHTML=`<span class="hs-account-avatar">${av}</span><span class="hs-account-meta"><span class="hs-account-name">${esc(p.full_name||'Your account')}</span><span class="hs-account-plan ${p.is_premium?'premium':''}">${p.is_premium?'⭐ Premium':'Free plan'}</span></span>`;document.body.appendChild(a);}
+  function renderMapShell(){if(document.getElementById('hs-match-map-card')||!document.getElementById('match-list'))return;const card=document.createElement('div');card.id='hs-match-map-card';card.className='card hs-map-card';card.innerHTML=`<div class="hs-map-head"><div><div class="hs-map-title">📍 Roommate map</div><div class="hs-map-sub">Compatible profiles near your selected area.</div></div><span class="eyebrow" style="margin:0">Approximate locations</span></div><div id="hs-match-map" class="hs-map"><div class="hs-map-loading">Loading map…</div></div><div class="hs-map-legend">Your location is used for distance calculations. Other users are shown approximately, never as an exact private address.</div>`;const heading=document.querySelector('.section-heading-row');heading?.parentElement?.insertBefore(card,heading);}
+  function loadLeaflet(){if(window.L)return Promise.resolve();return new Promise((resolve,reject)=>{const l=document.createElement('link');l.rel='stylesheet';l.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';document.head.appendChild(l);const s=document.createElement('script');s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';s.onload=resolve;s.onerror=reject;document.head.appendChild(s);});}
+  async function geocode(q){if(!q)return null;try{const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(q)}`,{headers:{'Accept-Language':'en'});const d=await r.json();return d?.[0]?[Number(d[0].lat),Number(d[0].lon)]:null;}catch{return null;}}
+  function point(p){const lat=Number(p.location_latitude),lon=Number(p.location_longitude);return Number.isFinite(lat)&&Number.isFinite(lon)?[lat,lon]:null;}
+  function approx(c){const r=.002;return [c[0]+(Math.random()-.5)*r,c[1]+(Math.random()-.5)*r];}
+  function isLight(){return document.body.classList.contains('light')||localStorage.getItem('homesync-theme')==='light';}
+  function addTiles(map){if(tileLayer)map.removeLayer(tileLayer);const light=isLight();tileLayer=L.tileLayer(light?'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png':'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',light?{attribution:'&copy; OpenStreetMap contributors'}:{attribution:'&copy; OpenStreetMap contributors &copy; CARTO',subdomains:'abcd',maxZoom:20}).addTo(map);}
+  async function loadMap(me,userId){const el=document.getElementById('hs-match-map');if(!el)return;try{await loadLeaflet();}catch{el.innerHTML='<div class="hs-map-error">Map could not be loaded. Check your internet connection.</div>';return;}
+    const {data:profiles}=await supabaseClient.from('profiles').select('id,full_name,city,preferred_area,is_premium,premium_since,location_latitude,location_longitude').neq('id',userId).limit(50);const points=[];let mePoint=point(me);if(!mePoint)mePoint=await geocode([me.preferred_area,me.city].filter(Boolean).join(', '));if(mePoint)points.push({coords:mePoint,name:'You',own:true});
+    const seen=new Set();for(const p of(profiles||[])){const q=[p.preferred_area,p.city].filter(Boolean).join(', ');if(!q||seen.has(q.toLowerCase()))continue;seen.add(q.toLowerCase());let c=point(p);if(!c)c=await geocode(q);if(c)points.push({coords:approx(c),name:p.full_name||'Roommate match',premium:p.is_premium===true||Boolean(p.premium_since)});if(points.length>=16)break;}
+    if(!points.length){el.innerHTML='<div class="hs-map-error">Add your location in Profile to activate the roommate map.</div>';return;}mapInstance=L.map(el,{scrollWheelZoom:false,zoomControl:true}).setView(mePoint||points[0].coords,mePoint?12:5);addTiles(mapInstance);const bounds=[];points.forEach(p=>{const m=L.marker(p.coords).addTo(mapInstance);m.bindPopup(`<strong>${esc(p.name)}</strong>${p.own?'<br>You are here':p.premium?'<br>⭐ Premium profile':''}`);bounds.push(p.coords);});if(bounds.length>1)mapInstance.fitBounds(bounds,{padding:[30,30],maxZoom:13});setTimeout(()=>mapInstance.invalidateSize(),300);
   }
-
-  function renderMapShell() {
-    if (document.getElementById('hs-match-map-card') || !document.getElementById('match-list')) return;
-    const card=document.createElement('div'); card.id='hs-match-map-card'; card.className='card hs-map-card';
-    card.innerHTML=`<div class="hs-map-head"><div><div class="hs-map-title">📍 Roommate map</div><div class="hs-map-sub">See where compatible profiles are located.</div></div><span class="eyebrow" style="margin:0">Location view</span></div><div id="hs-match-map" class="hs-map"></div><div class="hs-map-legend">Approximate locations only — HomeSync never exposes a user's exact address.</div>`;
-    const heading=document.querySelector('.section-heading-row'); heading?.parentElement?.insertBefore(card,heading);
-  }
-
-  function loadLeaflet() {
-    if (window.L) return Promise.resolve();
-    return new Promise((resolve,reject)=>{
-      const link=document.createElement('link'); link.rel='stylesheet'; link.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(link);
-      const script=document.createElement('script'); script.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; script.onload=resolve; script.onerror=reject; document.head.appendChild(script);
-    });
-  }
-
-  async function geocode(query) {
-    if (!query) return null;
-    try { const url=`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`; const res=await fetch(url,{headers:{'Accept-Language':'en'}}); const data=await res.json(); if(!data?.[0]) return null; return [Number(data[0].lat),Number(data[0].lon)]; } catch { return null; }
-  }
-
-  function isLight() { return document.body.classList.contains('light'); }
-
-  function addTiles(map) {
-    if (tileLayer) map.removeLayer(tileLayer);
-    const url = isLight()
-      ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-      : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-    const options = isLight()
-      ? { attribution:'&copy; OpenStreetMap contributors' }
-      : { attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:'abcd', maxZoom:20 };
-    tileLayer=L.tileLayer(url,options).addTo(map);
-  }
-
-  async function loadMap(me,userId) {
-    const el=document.getElementById('hs-match-map'); if(!el) return;
-    try { await loadLeaflet(); } catch { el.innerHTML='<div style="padding:24px;color:var(--ink-soft)">Map could not be loaded right now.</div>'; return; }
-    const {data:profiles}=await supabaseClient.from('profiles').select('id,full_name,city,preferred_area,is_premium,premium_since').neq('id',userId).limit(30);
-    const points=[];
-    const mePoint=await geocode([me.preferred_area,me.city].filter(Boolean).join(', '));
-    if(mePoint) points.push({coords:mePoint,name:'You',own:true});
-    const seen=new Set();
-    for(const p of (profiles||[])){
-      const query=[p.preferred_area,p.city].filter(Boolean).join(', '); if(!query||seen.has(query.toLowerCase())) continue;
-      seen.add(query.toLowerCase()); const coords=await geocode(query); if(coords) points.push({coords,name:p.full_name||'Roommate match',premium:p.is_premium===true||Boolean(p.premium_since)}); if(points.length>=12) break;
-    }
-    mapPoints=points;
-    mapInstance=L.map(el,{scrollWheelZoom:false}).setView(mePoint||[20.5937,78.9629],mePoint?12:5);
-    addTiles(mapInstance);
-    const bounds=[];
-    points.forEach(point=>{const marker=L.marker(point.coords).addTo(mapInstance); marker.bindPopup(`<strong>${esc(point.name)}</strong>${point.own?'<br>You are here':point.premium?'<br>⭐ Premium profile':''}`); bounds.push(point.coords);});
-    if(bounds.length>1) mapInstance.fitBounds(bounds,{padding:[30,30],maxZoom:13});
-    setTimeout(()=>mapInstance?.invalidateSize(),200);
-  }
-
-  function observeThemeChanges(){
-    const obs=new MutationObserver(()=>{ if(mapInstance){ addTiles(mapInstance); setTimeout(()=>mapInstance.invalidateSize(),80); } });
-    obs.observe(document.body,{attributes:true,attributeFilter:['class']});
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+  function observeThemeChanges(){new MutationObserver(()=>{if(mapInstance){addTiles(mapInstance);setTimeout(()=>mapInstance.invalidateSize(),100);}}).observe(document.body,{attributes:true,attributeFilter:['class']});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
