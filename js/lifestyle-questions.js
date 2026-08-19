@@ -20,24 +20,22 @@
 
   const state = { index: 0, answers: {}, dealbreakers: new Set() };
   const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function mount(){ return document.getElementById('lifestyle-question-mount'); }
 
-  function mount() { return document.getElementById('lifestyle-question-mount'); }
-
-  function goStep3() {
-    if (typeof window.goToStep === 'function') window.goToStep(3);
+  function goStep3(){
+    if(typeof window.goToStep === 'function') window.goToStep(3);
     else document.querySelector('.wizard-panel[data-panel="3"]')?.classList.add('active');
-    setTimeout(render, 0);
+    setTimeout(render,0);
   }
 
-  function render() {
-    const el = mount();
-    if (!el) return;
-    const q = QUESTIONS[state.index];
-    const selected = state.answers[q.id];
-    const pct = ((state.index + 1) / QUESTIONS.length) * 100;
-    el.innerHTML = `
+  function render(){
+    const el=mount(); if(!el)return;
+    const q=QUESTIONS[state.index];
+    const selected=state.answers[q.id];
+    const pct=((state.index+1)/QUESTIONS.length)*100;
+    el.innerHTML=`
       <div class="hs-mcq-card">
-        <div class="hs-mcq-top"><span>${esc(q.section)}</span><strong>${state.index + 1} / ${QUESTIONS.length}</strong></div>
+        <div class="hs-mcq-top"><span>${esc(q.section)}</span><strong>${state.index+1} / ${QUESTIONS.length}</strong></div>
         <div class="hs-mcq-bar"><i style="width:${pct}%"></i></div>
         <h3>${esc(q.text)}</h3>
         <p>Choose the answer that best represents you.</p>
@@ -49,43 +47,51 @@
         <div class="hs-mcq-note">15 questions · about 2 minutes</div>
       </div>`;
 
-    el.querySelectorAll('input[name="hs-answer"]').forEach(input => input.addEventListener('change', () => {
-      state.answers[q.id] = Number(input.value);
+    // Keep the viewport exactly where the user is. Changing an answer should never
+    // rebuild the page or move focus/scroll position.
+    el.querySelectorAll('input[name="hs-answer"]').forEach(input=>input.addEventListener('change',()=>{
+      state.answers[q.id]=Number(input.value);
       el.querySelectorAll('.hs-mcq-option').forEach(x=>x.classList.remove('selected'));
       input.closest('.hs-mcq-option')?.classList.add('selected');
     }));
-    el.querySelector('#hs-deal')?.addEventListener('change', e => e.target.checked ? state.dealbreakers.add(q.id) : state.dealbreakers.delete(q.id));
-    el.querySelector('#hs-back')?.addEventListener('click', () => {
-      if (state.index === 0) { if (typeof window.goToStep==='function') window.goToStep(2); return; }
-      state.index--; render(); window.scrollTo({top:0,behavior:'smooth'});
+    el.querySelector('#hs-deal')?.addEventListener('change',e=>e.target.checked?state.dealbreakers.add(q.id):state.dealbreakers.delete(q.id));
+
+    el.querySelector('#hs-back')?.addEventListener('click',()=>{
+      if(state.index===0){if(typeof window.goToStep==='function')window.goToStep(2);return;}
+      state.index--;
+      render();
+      // Deliberately no scrollTo: keep the question card in the same viewport position.
     });
-    el.querySelector('#hs-next')?.addEventListener('click', () => {
-      if (state.answers[q.id] === undefined) {
+
+    el.querySelector('#hs-next')?.addEventListener('click',()=>{
+      if(state.answers[q.id]===undefined){
         const msg=document.getElementById('onboarding-msg');
         if(msg){msg.textContent='Choose an answer to continue.';msg.classList.remove('hidden');}
         return;
       }
       if(state.index===14){
         window.homesyncCompatibilityAnswers={answers:{...state.answers},dealbreakers:[...state.dealbreakers],version:2,completed_at:new Date().toISOString()};
-        if(typeof window.goToStep==='function') window.goToStep(4);
+        if(typeof window.goToStep==='function')window.goToStep(4);
         return;
       }
-      state.index++; render(); window.scrollTo({top:0,behavior:'smooth'});
+      state.index++;
+      render();
+      // Deliberately no scrollTo: next question stays in the same card position.
     });
   }
 
   function init(){
     if(!document.getElementById('hs-mcq-style')){
       const s=document.createElement('style');s.id='hs-mcq-style';s.textContent=`
-        .hs-mcq-card{background:var(--card,#fff);border:1px solid var(--line,#ddd);border-radius:22px;padding:32px;box-shadow:0 15px 45px rgba(0,0,0,.07)}
-        .hs-mcq-top{display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;letter-spacing:.08em;font-size:.8rem}.hs-mcq-top span{font-weight:800;color:var(--sage,#10b981)}.hs-mcq-top strong{font-size:1rem}
-        .hs-mcq-bar{height:8px;background:var(--line,#ddd);border-radius:99px;margin:18px 0 36px;overflow:hidden}.hs-mcq-bar i{display:block;height:100%;background:var(--sage,#10b981);border-radius:99px}
-        .hs-mcq-card h3{font-size:1.5rem;margin:0 0 8px}.hs-mcq-card>p{color:var(--muted,#667);margin:0 0 20px}.hs-mcq-options{display:grid;gap:12px}.hs-mcq-option{position:relative;display:flex;align-items:center;gap:14px;padding:18px 20px;border:1px solid var(--line,#ddd);border-radius:16px;cursor:pointer;background:var(--card,#fff)}.hs-mcq-option:hover,.hs-mcq-option.selected{border-color:var(--sage,#10b981);background:rgba(16,185,129,.08)}.hs-mcq-option input{position:absolute;opacity:0}.hs-mcq-option .radio{width:18px;height:18px;border:1px solid #9ca3af;border-radius:50%;display:grid;place-items:center;flex:none}.hs-mcq-option.selected .radio{border-color:var(--sage,#10b981)}.hs-mcq-option.selected .radio:after{content:'';width:9px;height:9px;background:var(--sage,#10b981);border-radius:50%}.hs-mcq-deal{display:flex;gap:12px;margin-top:18px;padding:16px;border:1px dashed var(--line,#ddd);border-radius:16px;cursor:pointer}.hs-mcq-deal small{display:block;color:var(--muted,#667);margin-top:3px}.hs-mcq-actions{display:flex;justify-content:space-between;margin-top:28px}.hs-mcq-note{text-align:center;color:var(--muted,#667);font-size:.8rem;margin-top:14px}@media(max-width:700px){.hs-mcq-card{padding:22px}.hs-mcq-card h3{font-size:1.3rem}.hs-mcq-actions .btn{flex:1}}
+        .hs-mcq-card{background:var(--canvas-raised);border:1px solid var(--line);border-radius:22px;padding:32px;box-shadow:var(--shadow-card)}
+        .hs-mcq-top{display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;letter-spacing:.08em;font-size:.8rem}.hs-mcq-top span{font-weight:800;color:var(--sage)}.hs-mcq-top strong{font-size:1rem}
+        .hs-mcq-bar{height:8px;background:var(--line);border-radius:99px;margin:18px 0 36px;overflow:hidden}.hs-mcq-bar i{display:block;height:100%;background:var(--sage);border-radius:99px;transition:width .2s ease}
+        .hs-mcq-card h3{font-size:1.5rem;margin:0 0 8px}.hs-mcq-card>p{color:var(--ink-soft);margin:0 0 20px}.hs-mcq-options{display:grid;gap:12px}.hs-mcq-option{position:relative;display:flex;align-items:center;gap:14px;padding:18px 20px;border:1px solid var(--line);border-radius:16px;cursor:pointer;background:var(--canvas-raised);transition:border-color .15s,background .15s}.hs-mcq-option:hover,.hs-mcq-option.selected{border-color:var(--sage);background:var(--sage-soft)}.hs-mcq-option input{position:absolute;opacity:0;pointer-events:none}.hs-mcq-option .radio{width:18px;height:18px;border:1px solid #9ca3af;border-radius:50%;display:grid;place-items:center;flex:none}.hs-mcq-option.selected .radio{border-color:var(--sage)}.hs-mcq-option.selected .radio:after{content:'';width:9px;height:9px;background:var(--sage);border-radius:50%}.hs-mcq-deal{display:flex;gap:12px;margin-top:18px;padding:16px;border:1px dashed var(--line);border-radius:16px;cursor:pointer}.hs-mcq-deal small{display:block;color:var(--ink-soft);margin-top:3px}.hs-mcq-actions{display:flex;justify-content:space-between;margin-top:28px}.hs-mcq-note{text-align:center;color:var(--ink-soft);font-size:.8rem;margin-top:14px}@media(max-width:700px){.hs-mcq-card{padding:22px}.hs-mcq-card h3{font-size:1.3rem}.hs-mcq-actions .btn{flex:1}}
       `;document.head.appendChild(s);
     }
     render();
   }
   window.homesyncRenderLifestyleQuestions=render;
-  window.addEventListener('homesync:lifestyle', goStep3);
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+  window.addEventListener('homesync:lifestyle',goStep3);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
