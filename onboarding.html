@@ -123,66 +123,11 @@
           </div>
         </div>
 
-        <!-- Step 3: Lifestyle -->
+        <!-- Step 3: Lifestyle — rendered as the 15-question compatibility flow by lifestyle-questions.js -->
         <div class="wizard-panel" data-panel="3">
           <div class="wizard-panel-icon">🌙</div>
           <h3>Lifestyle</h3>
-          <p class="muted" style="margin-bottom:22px;">This is the heart of your compatibility score.</p>
-
-          <label for="sleep_schedule">Sleep schedule — early riser ↔ night owl</label>
-          <div class="range-row">
-            <input type="range" name="sleep_schedule" id="sleep_schedule" min="1" max="5" value="3" />
-            <span class="range-val" id="sleep_schedule-val">3</span>
-          </div>
-
-          <label for="cleanliness">Cleanliness — relaxed ↔ very tidy</label>
-          <div class="range-row">
-            <input type="range" name="cleanliness" id="cleanliness" min="1" max="5" value="3" />
-            <span class="range-val" id="cleanliness-val">3</span>
-          </div>
-
-          <label for="guest_frequency">Guest frequency — rarely ↔ often</label>
-          <div class="range-row">
-            <input type="range" name="guest_frequency" id="guest_frequency" min="1" max="5" value="3" />
-            <span class="range-val" id="guest_frequency-val">3</span>
-          </div>
-
-          <label for="personality">Personality — introvert ↔ extrovert</label>
-          <div class="range-row">
-            <input type="range" name="personality" id="personality" min="1" max="5" value="3" />
-            <span class="range-val" id="personality-val">3</span>
-          </div>
-
-          <div class="grid-2">
-            <div>
-              <label for="smoking_drinking">Smoking / drinking</label>
-              <select name="smoking_drinking" id="smoking_drinking">
-                <option value="never">Never</option>
-                <option value="social">Socially</option>
-                <option value="regular">Regularly</option>
-              </select>
-            </div>
-            <div>
-              <label for="cooking_habits">Cooking habits</label>
-              <select name="cooking_habits" id="cooking_habits">
-                <option value="self_cook">Self-cook</option>
-                <option value="order_in">Order-in</option>
-                <option value="shared">Shared cooking</option>
-              </select>
-            </div>
-          </div>
-
-          <label for="conflict_style">When there's a disagreement, I usually…</label>
-          <select name="conflict_style" id="conflict_style">
-            <option value="avoids">Avoid bringing it up</option>
-            <option value="discusses">Talk it through calmly</option>
-            <option value="confronts">Address it directly, right away</option>
-          </select>
-
-          <div class="wizard-nav">
-            <button type="button" class="btn btn-ghost wizard-back" data-back="2">← Back</button>
-            <button type="button" class="btn btn-primary wizard-next" data-next="4">Continue →</button>
-          </div>
+          <p class="muted">Loading your compatibility questions…</p>
         </div>
 
         <!-- Step 4: About you -->
@@ -210,5 +155,6 @@
 <script src="js/ui.js"></script>
 <script src="js/theme.js"></script>
 <script src="js/onboarding.js"></script>
+<script src="js/lifestyle-questions.js"></script>
 </body>
 </html>
