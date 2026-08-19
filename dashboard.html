@@ -7,13 +7,29 @@
 <meta name="robots" content="noindex, follow" />
 <link rel="stylesheet" href="css/style.css" />
 <link rel="icon" type="image/png" href="assets/favicon-64.png" />
+<style>
+.quick-match{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px}.quick-match-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.quick-match-kicker{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--sage);font-weight:800}.quick-question{margin-top:18px}.quick-question h3{margin:0 0 14px;font-size:1.2rem}.quick-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.quick-option{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;background:transparent}.quick-option:hover{border-color:var(--sage)}.quick-option input{accent-color:var(--sage)}.quick-start{display:flex;justify-content:flex-end;margin-top:16px}.quick-error{color:var(--danger);margin-top:10px;display:none}@media(max-width:700px){.quick-match-head{display:block}.quick-options{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <script>(function(){try{if(localStorage.getItem('homesync-theme')==='light'){document.body.classList.add('light');}}catch(e){}})();</script>
 <nav class="nav"><div class="nav-inner"><div class="brand"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div><button id="nav-toggle" class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button><div class="nav-links" id="nav-links"><button id="theme-toggle" class="theme-toggle" type="button" title="Toggle theme" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><a href="compatibility.html" class="btn btn-ghost">🧩 Compatibility</a><a href="profile.html">My account</a><a href="#" id="logout-btn" class="btn btn-ghost">Sign out</a></div></div></nav>
 <section class="wrap section-tight">
 <div id="broadcast-banner" class="hidden" style="display:flex;align-items:flex-start;gap:12px;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--sage);border-radius:12px;padding:14px 18px;margin-bottom:20px"><div><div style="font-weight:700;margin-bottom:2px" id="broadcast-banner-title"></div><div class="muted" style="font-size:.9rem" id="broadcast-banner-body"></div></div><button type="button" id="broadcast-banner-dismiss" class="admin-icon-btn" title="Dismiss">✕</button></div>
-<div class="dash-banner"><div class="dash-banner-text"><span class="eyebrow">Your matches</span><h2>Welcome back, <span id="welcome-name">there</span>.</h2><p>Ranked by compatibility across lifestyle, budget, location, move-in timing and real roommate preferences.</p></div><div class="dash-banner-actions"><a href="compatibility.html" class="btn btn-primary">Improve my match profile</a><a href="#matches" class="btn btn-ghost">Jump to matches</a></div></div>
+<div class="dash-banner"><div class="dash-banner-text"><span class="eyebrow">Your matches</span><h2>Welcome back, <span id="welcome-name">there</span>.</h2><p>Ranked by compatibility across lifestyle, budget, location, move-in timing and real roommate preferences.</p></div><div class="dash-banner-actions"><a href="compatibility.html#start" class="btn btn-primary">Improve my match profile</a><a href="#matches" class="btn btn-ghost">Jump to matches</a></div></div>
+
+<!-- Always-visible first-question entry point: users can see and start the questionnaire without guessing where it is. -->
+<div class="quick-match" id="quick-match">
+  <div class="quick-match-head"><div><div class="quick-match-kicker">Compatibility check · 1 of 15</div><h3 style="margin:.35rem 0 0">Start with your daily routine</h3><p class="muted" style="margin:.4rem 0 0">Your answers help HomeSync find roommates whose everyday habits fit yours.</p></div><span class="eyebrow">~2 minutes</span></div>
+  <div class="quick-question"><h3>What time do you usually go to bed?</h3><div class="quick-options">
+    <label class="quick-option"><input type="radio" name="quick_sleep" value="0"> Before 10 PM</label>
+    <label class="quick-option"><input type="radio" name="quick_sleep" value="1"> 10 PM–12 AM</label>
+    <label class="quick-option"><input type="radio" name="quick_sleep" value="2"> 12–2 AM</label>
+    <label class="quick-option"><input type="radio" name="quick_sleep" value="3"> After 2 AM</label>
+  </div><div id="quick-error" class="quick-error">Choose an answer to continue.</div></div>
+  <div class="quick-start"><button id="quick-next" class="btn btn-primary" type="button">Continue to all 15 questions →</button></div>
+</div>
+
 <div class="stat-row" id="stat-row"><div class="card stat-card"><div class="stat-card-top"><span class="stat-card-icon">🤝</span></div><div class="stat-card-val" id="stat-match-count">—</div><div class="stat-card-label">Matches found</div></div><div class="card stat-card"><div class="stat-card-top"><span class="stat-card-icon">🏆</span></div><div class="stat-card-val" id="stat-top-score">—</div><div class="stat-card-label">Top compatibility score</div></div><div class="card stat-card"><div class="stat-card-top"><span class="stat-card-icon">📍</span></div><div class="stat-card-val" id="stat-city">—</div><div class="stat-card-label">Matching city</div></div><div class="card stat-card"><div class="stat-card-top"><span class="stat-card-icon">✅</span></div><div class="stat-card-val" id="stat-completeness">—</div><div class="stat-card-label">Profile completeness</div><div class="stat-card-trend up" id="stat-completeness-hint"></div></div></div>
 <div class="premium-banner" id="premium-banner"><div><div class="premium-banner-badge" id="premium-banner-badge">✨ Premium</div><div class="premium-banner-title" id="premium-banner-title">HomeSync AI Premium</div><p class="premium-banner-sub" id="premium-banner-sub">Unlock priority matching, unlimited cross-city search and icebreaker suggestions.</p></div><a class="btn btn-primary" id="premium-banner-btn" href="pricing.html">Upgrade to Premium</a></div>
 <div class="card" style="padding:16px 18px;margin-bottom:22px"><strong>Match signals</strong><div class="filter-chip-row" style="margin-top:12px"><button class="filter-chip active" data-market-filter="all">All strong matches</button><button class="filter-chip" data-market-filter="active">🔥 Active recently</button><button class="filter-chip" data-market-filter="verified">✓ Verified</button><button class="filter-chip" data-market-filter="moving">⚡ Moving soon</button></div></div>
@@ -21,4 +37,13 @@
 </section>
 <footer><div class="wrap footer-inner"><span>© 2026 HomeSync AI — B.Tech Project-II prototype</span><span>Aniket · Anchal Garg · Anant Saxena · Ayush Chauhan</span></div></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script><script src="js/supabaseClient.js"></script><script src="js/ui.js"></script><script src="js/theme.js"></script><script src="js/matching.js"></script><script src="js/dashboard.js"></script><script src="js/market-features.js"></script>
+<script>
+document.getElementById('quick-next')?.addEventListener('click',()=>{
+ const selected=document.querySelector('input[name="quick_sleep"]:checked');
+ const error=document.getElementById('quick-error');
+ if(!selected){error.style.display='block';return;}
+ sessionStorage.setItem('homesync_quick_sleep', selected.value);
+ window.location.href='compatibility.html#start';
+});
+</script>
 </body></html>
