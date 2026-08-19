@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compatibility profile — HomeSync AI</title>
+<meta name="robots" content="noindex, follow">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/png" href="assets/favicon-64.png">
+<style>
+.compat-shell{max-width:820px;margin:0 auto}.q-card{padding:28px}.q-progress{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:18px 0 28px}.q-progress>span{display:block;height:100%;width:0;background:var(--sage);transition:width .25s}.q-option{display:block;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;cursor:pointer;transition:.15s}.q-option:hover{border-color:var(--sage)}.q-option.selected{border-color:var(--sage);background:color-mix(in srgb,var(--sage) 12%,transparent)}.q-option input{margin-right:10px}.deal-row{display:flex;align-items:center;gap:10px;margin-top:18px;padding:12px;border:1px dashed var(--line);border-radius:10px}.q-nav{display:flex;justify-content:space-between;gap:12px;margin-top:26px}.q-meta{display:flex;justify-content:space-between;gap:12px}.q-section{font-size:.82rem;text-transform:uppercase;letter-spacing:.08em}.saved{display:none}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="nav-inner"><div class="brand"><img src="assets/logo-transparent.png" class="brand-mark" alt=""> HomeSync AI</div><div class="nav-links"><a href="dashboard.html">← Dashboard</a><a href="#" id="logout-btn" class="btn btn-ghost">Sign out</a></div></div></nav>
+<section class="wrap section compat-shell">
+<div class="wizard-head"><span class="eyebrow">15 questions · about 2 minutes</span><h2>Find someone who actually fits your life</h2><p>Answer honestly. We use these signals to explain why a roommate is a strong match — not just give you a mysterious percentage.</p></div>
+<div class="q-card card">
+<div class="q-meta"><span id="q-section" class="q-section">Daily routine</span><strong id="q-count">1 / 15</strong></div>
+<div class="q-progress"><span id="q-progress"></span></div>
+<div id="question-area"></div>
+<div class="q-nav"><button id="q-back" class="btn btn-ghost" type="button">← Back</button><button id="q-next" class="btn btn-primary" type="button">Next →</button></div>
+<div id="saved" class="saved msg" style="margin-top:16px"></div>
+</div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/questions/sections/compact-questions.js"></script>
+<script src="js/compatibility.js"></script>
+</body>
+</html>
