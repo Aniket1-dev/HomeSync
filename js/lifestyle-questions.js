@@ -43,18 +43,10 @@
     document.head.appendChild(s);
   }
 
-  function ensureHiddenFields(panel){
-    const names=['sleep_schedule','cleanliness','guest_frequency','personality','smoking_drinking','cooking_habits','conflict_style'];
-    names.forEach(name=>{
-      if(panel.querySelector('[data-lifestyle-hidden="'+name+'"]')) return;
-      const input=document.createElement('input'); input.type='hidden'; input.name=name; input.id=name; input.dataset.lifestyleHidden=name; panel.appendChild(input);
-    });
-  }
-
   function render(){
     const panel=document.querySelector('.wizard-panel[data-panel="3"]');
     if(!panel) return;
-    injectStyle(); ensureHiddenFields(panel);
+    injectStyle();
     const q=QUESTIONS[state.index];
     const selected=state.answers[q.id];
     const percent=((state.index+1)/QUESTIONS.length)*100;
@@ -70,6 +62,13 @@
         <label class="lq-deal"><input type="checkbox" id="lq-dealbreaker" ${state.dealbreakers.has(q.id)?'checked':''}><span><strong>Must match</strong><small>Treat this preference as a dealbreaker when comparing roommates.</small></span></label>
         <div class="lq-nav"><button type="button" class="btn btn-ghost" id="lq-back">← Back</button><button type="button" class="btn btn-primary" id="lq-next">${state.index===QUESTIONS.length-1?'Finish lifestyle →':'Next →'}</button></div>
         <div class="lq-note">15 questions · about 2 minutes · you can change answers later</div>
+        <input type="hidden" name="sleep_schedule" id="sleep_schedule" value="3" data-lifestyle-hidden="sleep_schedule">
+        <input type="hidden" name="cleanliness" id="cleanliness" value="3" data-lifestyle-hidden="cleanliness">
+        <input type="hidden" name="guest_frequency" id="guest_frequency" value="3" data-lifestyle-hidden="guest_frequency">
+        <input type="hidden" name="personality" id="personality" value="3" data-lifestyle-hidden="personality">
+        <input type="hidden" name="smoking_drinking" id="smoking_drinking" value="never" data-lifestyle-hidden="smoking_drinking">
+        <input type="hidden" name="cooking_habits" id="cooking_habits" value="self_cook" data-lifestyle-hidden="cooking_habits">
+        <input type="hidden" name="conflict_style" id="conflict_style" value="discusses" data-lifestyle-hidden="conflict_style">
       </div>`;
 
     panel.querySelectorAll('input[name="lq-answer"]').forEach(input=>input.addEventListener('change',()=>{
@@ -103,8 +102,7 @@
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
-    const panel=document.querySelector('.wizard-panel[data-panel="3"]'); if(!panel)return;
-    // Remove the old multi-field lifestyle form and replace it with the one-question flow.
+    const panel=document.querySelector('.wizard-panel[data-panel="3"]); if(!panel)return;
     render();
   });
 })();
