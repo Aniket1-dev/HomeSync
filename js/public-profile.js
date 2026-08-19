@@ -1,106 +1,41 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  const root = document.getElementById('profile-root');
-  const params = new URLSearchParams(location.search);
-  const viewedId = params.get('id') || params.get('profile_id') || params.get('user_id');
-
-  if (!viewedId) {
-    root.innerHTML='<div class="card"><h3>Profile not found</h3><p class="muted">This profile link is missing a user ID.</p></div>';
-    return;
-  }
-
-  // Show a useful state instead of leaving the page stuck forever if auth/network is slow.
-  const failTimer = setTimeout(() => {
-    if (root.querySelector('.profile-loading')) {
-      root.innerHTML='<div class="card"><h3>Couldn’t load this profile</h3><p class="muted">Please refresh once. If it still fails, the profile may be private or unavailable.</p><a class="btn btn-primary" href="dashboard.html">Back to matches</a></div>';
-    }
-  }, 10000);
-
+  const root=document.getElementById('profile-root');
+  const params=new URLSearchParams(location.search);
+  const viewedId=params.get('id')||params.get('profile_id')||params.get('user_id');
+  if(!viewedId){root.innerHTML='<div class="card"><h3>Profile not found</h3><p class="muted">No profile was selected.</p></div>';return;}
+  const failTimer=setTimeout(()=>{if(root.querySelector('.profile-loading'))root.innerHTML='<div class="card"><h3>Couldn’t load this profile</h3><p class="muted">Please refresh once. If it still fails, the profile may be private or unavailable.</p><a class="btn btn-primary" href="dashboard.html">Back to matches</a></div>';},10000);
   root.innerHTML='<div class="card profile-loading"><p>Loading profile…</p></div>';
-
-  try {
-    if (!window.supabaseClient) throw new Error('Supabase client is not initialized.');
-
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-    if (authError) throw authError;
-    if (!user) { location.href='login.html'; return; }
-    if (user.id === viewedId) { location.href='profile.html'; return; }
-
-    const { data: profile, error } = await supabaseClient
-      .from('profiles')
-      .select('id,full_name,age,gender,city,preferred_area,budget_min,budget_max,bio,photo_url,is_premium,premium_since,smoking_drinking,cooking_habits')
-      .eq('id', viewedId)
-      .maybeSingle();
-
-    if (error) throw error;
-    if (!profile) throw new Error('This profile is not visible or no longer exists.');
-
-    // IMPORTANT: Do not await analytics/notification writes before rendering.
-    // A missing RLS policy/table must never leave the profile page stuck on Loading.
-    Promise.resolve().then(async () => {
-      try {
-        await supabaseClient.from('profile_views').insert({ viewer_id:user.id, viewed_id:viewedId });
-      } catch(e) { console.warn('profile_views tracking skipped:', e); }
-    });
-
-    Promise.resolve().then(async () => {
-      try {
-        // Do not send the old `data` column; some installations do not have it.
-        await supabaseClient.from('notifications').insert({
-          user_id:viewedId,
-          type:'profile_view',
-          title:'Someone viewed your profile',
-          body:'A HomeSync member viewed your roommate profile.',
-          link:'profile.html#notifications'
-        });
-      } catch(e) { console.warn('profile notification skipped:', e); }
-    });
+  try{
+    if(!window.supabaseClient)throw new Error('Supabase client is not initialized.');
+    const {data:{user},error:authError}=await supabaseClient.auth.getUser();if(authError)throw authError;if(!user){location.href='login.html';return;}if(user.id===viewedId){location.href='profile.html';return;}
+    const {data:profile,error}=await supabaseClient.from('profiles').select('*').eq('id',viewedId).maybeSingle();
+    if(error)throw error;if(!profile)throw new Error('This profile is not visible or no longer exists.');
 
     const initials=(profile.full_name||'?').split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase();
-    const avatar=profile.photo_url ? `background-image:url('${String(profile.photo_url).replace(/'/g,"%27")}')` : '';
+    const avatar=profile.photo_url?`background-image:url('${String(profile.photo_url).replace(/'/g,'%27')}')`:'';
+    const premium=profile.is_premium||profile.premium_since;
+    const lifestyle=[['🌙','Sleep schedule',profile.sleep_schedule],['🧹','Cleanliness',profile.cleanliness],['👥','Guests',profile.guest_frequency],['🧠','Personality',profile.personality],['🚭','Smoking / drinking',profile.smoking_drinking],['🍳','Cooking',profile.cooking_habits],['🗣️','Conflict style',profile.conflict_style]].filter(x=>x[2]!==null&&x[2]!==undefined&&String(x[2]).trim()!=='');
+    const verification=[['Identity',profile.identity_verified],['Phone',profile.phone_verified],['Email',profile.email_verified],['Room listing',profile.room_verified]];
+    const verified=verification.filter(x=>x[1]===true).length;
+    const joinDate=profile.created_at?new Date(profile.created_at).toLocaleDateString('en-IN',{month:'short',year:'numeric'}):'Recently';
 
-    root.innerHTML=`
-      <div class="card">
-        <div class="profile-hero">
-          <div class="public-avatar" style="${avatar}">${profile.photo_url?'':initials}</div>
-          <div>
-            <span class="eyebrow">Roommate profile</span>
-            <h1 style="margin:4px 0 0">${esc(profile.full_name||'Unnamed')}</h1>
-            <p class="muted" style="margin:6px 0">${esc([profile.age?profile.age+' years':'',profile.city||'',profile.preferred_area||''].filter(Boolean).join(' · '))}</p>
-            <div class="profile-badges">
-              ${profile.is_premium||profile.premium_since?'<span class="pill">⭐ Premium</span>':''}
-              <span class="pill">🤝 Match profile</span>
-            </div>
-          </div>
-          <div class="profile-action"><button class="btn btn-primary" id="merge-btn">🤝 Raise merge request</button></div>
-        </div>
-        <div class="privacy">🔒 <strong>Privacy protected.</strong> Exact address, phone number and private questionnaire answers are not shown on a public profile.</div>
-      </div>
-      <div class="profile-grid">
-        <div class="card info-card"><h4>💰 Budget</h4><div>₹${profile.budget_min||'—'} – ₹${profile.budget_max||'—'} / month</div></div>
-        <div class="card info-card"><h4>📍 Preferred area</h4><div>${esc(profile.preferred_area||profile.city||'Not specified')}</div></div>
-        <div class="card info-card"><h4>🚭 Home habits</h4><div>${esc(profile.smoking_drinking||'Not specified')}</div></div>
-        <div class="card info-card"><h4>🍳 Cooking</h4><div>${esc(profile.cooking_habits||'Not specified')}</div></div>
-        <div class="card info-card" style="grid-column:1/-1"><h4>About</h4><p style="white-space:pre-wrap">${esc(profile.bio||'No bio added yet.')}</p></div>
-      </div>`;
+    root.innerHTML=`<section class="card profile-public-hero"><div class="profile-hero"><div class="public-avatar" style="${avatar}">${profile.photo_url?'':initials}</div><div><span class="eyebrow">Roommate profile</span><h1 style="margin:4px 0 0">${esc(profile.full_name||'Unnamed')}</h1><p class="muted" style="margin:6px 0">${esc([profile.age?profile.age+' years':'',profile.gender||'',profile.city||'',profile.preferred_area||''].filter(Boolean).join(' · '))}</p><div class="profile-badges"><span class="pill">🏠 Looking for a roommate</span>${premium?'<span class="pill">⭐ Premium</span>':''}<span class="pill">📅 On HomeSync since ${joinDate}</span></div></div><div class="profile-action"><button class="btn btn-primary" id="merge-btn">🤝 Raise merge request</button></div></div><div class="privacy">🔒 <strong>Privacy protected.</strong> Exact address, phone number and private questionnaire answers are never shown publicly.</div></section>
+    <div class="profile-grid">
+      <div class="card info-card"><h4>👋 About</h4><p style="white-space:pre-wrap">${esc(profile.bio||'This person has not added a bio yet.')}</p></div>
+      <div class="card info-card"><h4>💰 Budget & move-in</h4><p><strong>₹${profile.budget_min||'—'} – ₹${profile.budget_max||'—'}</strong> / month</p><p class="muted">Move-in: ${esc(profile.available_from||'Flexible')}</p></div>
+      <div class="card info-card"><h4>📍 Location</h4><p><strong>${esc(profile.preferred_area||profile.city||'Not specified')}</strong></p><p class="muted">Exact address is hidden until both sides choose to share it.</p></div>
+      <div class="card info-card"><h4>🛡️ Verification</h4><div class="verify-count">${verified}/${verification.length} verified</div><div class="profile-badges">${verification.map(x=>`<span class="pill">${x[1]===true?'✓':'○'} ${x[0]}</span>`).join('')}</div></div>
+      <div class="card info-card" style="grid-column:1/-1"><h4>✨ Lifestyle</h4><p class="muted">Public compatibility signals — private questionnaire answers stay hidden.</p><div class="profile-lifestyle-grid">${lifestyle.length?lifestyle.map(x=>`<div class="lifestyle-item"><span>${x[0]}</span><div><small>${esc(x[1])}</small><strong>${esc(formatValue(x[2]))}</strong></div></div>`).join(''):'<p class="muted">Lifestyle details not added yet.</p>'}</div></div>
+      <div class="card info-card" style="grid-column:1/-1"><h4>📝 Posts & updates</h4><div id="profile-posts"><p class="muted">Loading posts…</p></div></div>
+    </div>`;
 
-    document.getElementById('merge-btn').addEventListener('click', async () => {
-      const btn=document.getElementById('merge-btn');
-      btn.disabled=true; btn.textContent='Sending…';
-      try {
-        const { error } = await supabaseClient.rpc('create_roommate_merge_request',{p_target_user_id:viewedId});
-        if(error) throw error;
-        btn.textContent='✓ Request sent';
-      } catch(error) {
-        btn.disabled=false;
-        btn.textContent='🤝 Raise merge request';
-        alert(error.message || 'Could not send merge request.');
-      }
-    });
-  } catch(error) {
-    root.innerHTML=`<div class="card"><h3>Profile unavailable</h3><p class="muted">${esc(error?.message || 'Unable to load this profile.')}</p><a class="btn btn-primary" href="dashboard.html">← Back to matches</a></div>`;
-  } finally {
-    clearTimeout(failTimer);
-  }
+    document.getElementById('merge-btn').addEventListener('click',async()=>{const btn=document.getElementById('merge-btn');btn.disabled=true;btn.textContent='Sending…';try{const {error}=await supabaseClient.rpc('create_roommate_merge_request',{p_target_user_id:viewedId});if(error)throw error;btn.textContent='✓ Request sent';}catch(error){btn.disabled=false;btn.textContent='🤝 Raise merge request';alert(error.message||'Could not send merge request.');}});
+    loadPosts(viewedId);
+    Promise.resolve().then(()=>supabaseClient.from('profile_views').insert({viewer_id:user.id,viewed_id:viewedId})).catch(()=>{});
+    Promise.resolve().then(()=>supabaseClient.from('notifications').insert({user_id:viewedId,type:'profile_view',title:'Someone viewed your profile',body:'A HomeSync member viewed your roommate profile.',link:'profile.html#notifications'})).catch(()=>{});
+  }catch(error){root.innerHTML=`<div class="card"><h3>Profile unavailable</h3><p class="muted">${esc(error?.message||'Unable to load this profile.')}</p><a class="btn btn-primary" href="dashboard.html">← Back to matches</a></div>`;}finally{clearTimeout(failTimer);}
 });
 
+async function loadPosts(userId){const box=document.getElementById('profile-posts');if(!box)return;const {data,error}=await supabaseClient.from('profile_posts').select('id,content,image_url,created_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(12);if(error||!data||!data.length){box.innerHTML='<div class="empty-posts"><span>📝</span><p>No public posts yet.</p><small>Roommate updates, room-hunt posts and introductions will appear here.</small></div>';return;}box.innerHTML=data.map(p=>`<article class="profile-post"><div class="post-meta"><strong>${esc(new Date(p.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}))}</strong><span>Public update</span></div><p>${esc(p.content||'')}</p>${p.image_url?`<img src="${esc(p.image_url)}" alt="Roommate post" loading="lazy">`:''}</article>`).join('');}
+function formatValue(v){if(typeof v==='number'&&v>=1&&v<=5)return ['Very relaxed','Relaxed','Balanced','Tidy','Very tidy'][Math.round(v)-1];return String(v);}
 function esc(v){const d=document.createElement('div');d.textContent=String(v??'');return d.innerHTML;}
