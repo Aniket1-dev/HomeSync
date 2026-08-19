@@ -1,0 +1,80 @@
+name: HomeSync Mobile Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'package.json'
+      - 'capacitor.config.ts'
+      - '**.html'
+      - 'css/**'
+      - 'js/**'
+      - 'assets/**'
+      - '.github/workflows/mobile-build.yml'
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  android:
+    name: Android debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Add Android platform
+        run: npx cap add android
+      - name: Sync web app
+        run: npx cap sync android
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: homesync-android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+  ios:
+    name: iOS simulator build
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Add iOS platform
+        run: npx cap add ios
+      - name: Sync web app
+        run: npx cap sync ios
+      - name: Build iOS simulator app
+        run: |
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath ios/build \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Upload iOS simulator build
+        uses: actions/upload-artifact@v4
+        with:
+          name: homesync-ios-simulator
+          path: ios/build/Build/Products/Debug-iphonesimulator/App.app
