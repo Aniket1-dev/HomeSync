@@ -31,8 +31,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Install dependencies
-        run: npm install
+      # Deliberately do not use npm ci or setup-node's npm cache.
+      # HomeSync intentionally has no package-lock.json.
+      - name: Install dependencies without a lockfile
+        run: npm install --no-package-lock --no-audit --no-fund
+      - name: Verify no lockfile is required
+        run: test ! -f package-lock.json
       - name: Prepare web bundle
         run: npm run mobile:prepare
       - name: Add Android platform
@@ -58,8 +62,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Install dependencies
-        run: npm install
+      # Deliberately do not use npm ci or setup-node's npm cache.
+      # HomeSync intentionally has no package-lock.json.
+      - name: Install dependencies without a lockfile
+        run: npm install --no-package-lock --no-audit --no-fund
+      - name: Verify no lockfile is required
+        run: test ! -f package-lock.json
       - name: Prepare web bundle
         run: npm run mobile:prepare
       - name: Add iOS platform
