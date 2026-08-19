@@ -47,6 +47,31 @@ function populateForm() {
 
   document.getElementById("dark-mode-toggle").checked = !!currentProfile.dark_mode;
   applyDarkMode(!!currentProfile.dark_mode);
+
+  renderPlanSection();
+}
+
+function renderPlanSection() {
+  const badge = document.getElementById("plan-badge");
+  const hint = document.getElementById("plan-hint");
+  const cta = document.getElementById("plan-cta-btn");
+
+  if (currentProfile.is_premium) {
+    badge.textContent = "✨ Premium";
+    badge.classList.remove("free");
+    const since = currentProfile.premium_since ? new Date(currentProfile.premium_since).toLocaleDateString() : null;
+    hint.textContent = since
+      ? `Premium since ${since}. Unlimited matches, cross-city search, priority placement, and icebreakers are unlocked.`
+      : "Unlimited matches, cross-city search, priority placement, and icebreakers are unlocked.";
+    cta.textContent = "Manage plan";
+    cta.href = "pricing.html";
+  } else {
+    badge.textContent = "Free";
+    badge.classList.add("free");
+    hint.textContent = "Upgrade for unlimited matches, cross-city search, priority placement, and icebreakers.";
+    cta.textContent = "Upgrade to Premium";
+    cta.href = "pricing.html";
+  }
 }
 
 function wireEvents() {

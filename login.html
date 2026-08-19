@@ -80,10 +80,10 @@
       <!-- OTP verification (shown after a correct password) -->
       <form id="otp-step" class="hidden" novalidate>
         <p style="margin-bottom:16px;">
-          We sent a 8-digit code to <strong id="otp-email-label"></strong>. Enter it below to finish signing in.
+          We sent a 6-digit code to <strong id="otp-email-label"></strong>. Enter it below to finish signing in.
         </p>
         <label for="otp-code">Verification code</label>
-        <input type="text" id="otp-code" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="one-time-code" placeholder="000000" required />
+        <input type="text" id="otp-code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="000000" required />
 
         <button type="submit" id="otp-verify-btn" class="btn btn-primary btn-block">Verify &amp; sign in</button>
         <div class="field-link-row" style="justify-content:center; margin-top:14px;">

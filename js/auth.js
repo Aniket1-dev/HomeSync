@@ -1,5 +1,4 @@
 // Auth flows: Google OAuth + Email/Password Sign in & Sign up
-// Auth flows: Google OAuth + Email/Password Sign in & Sign up
 // Requires: supabaseClient.js loaded first
 
 // Builds a redirect URL that keeps whatever subpath the site is served
@@ -170,8 +169,8 @@ async function handleVerifyOtp(e) {
     showStep("signin");
     return;
   }
-  if (!/^\d{8}$/.test(code)) {
-    showMsg(els.msg, "Enter the 8-digit code from your email.");
+  if (!/^\d{6}$/.test(code)) {
+    showMsg(els.msg, "Enter the 6-digit code from your email.");
     return;
   }
 
