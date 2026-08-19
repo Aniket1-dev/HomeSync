@@ -141,7 +141,7 @@ async function loadUsers() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    document.getElementById("admin-users-body").innerHTML = `<tr><td colspan="6" class="muted center">Couldn't load users: ${escapeHtml(error.message)}</td></tr>`;
+    document.getElementById("admin-users-body").innerHTML = `<tr><td colspan="7" class="muted center">Couldn't load users: ${escapeHtml(error.message)}</td></tr>`;
     return;
   }
 
@@ -215,6 +215,8 @@ function renderStats() {
   const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const newThisWeek = allUsers.filter((u) => u.created_at && new Date(u.created_at).getTime() >= weekAgo).length;
   document.getElementById("admin-stat-new").textContent = newThisWeek;
+
+  document.getElementById("admin-stat-premium").textContent = allUsers.filter((u) => u.is_premium).length;
 }
 
 function filterUsers(query) {
@@ -223,6 +225,7 @@ function filterUsers(query) {
   if (currentStatusFilter === "active") filtered = filtered.filter((u) => (u.status || "active") === "active");
   else if (currentStatusFilter === "suspended") filtered = filtered.filter((u) => u.status === "suspended");
   else if (currentStatusFilter === "admin") filtered = filtered.filter((u) => u.is_admin);
+  else if (currentStatusFilter === "premium") filtered = filtered.filter((u) => u.is_premium);
 
   const q = (query || "").trim().toLowerCase();
   if (q) {
@@ -237,7 +240,7 @@ function filterUsers(query) {
 function renderUsersTable(users) {
   const body = document.getElementById("admin-users-body");
   if (users.length === 0) {
-    body.innerHTML = `<tr><td colspan="6" class="muted center">No users match this filter.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="7" class="muted center">No users match this filter.</td></tr>`;
     return;
   }
 
@@ -245,6 +248,9 @@ function renderUsersTable(users) {
 
   body.querySelectorAll("[data-action='toggle-status']").forEach((btn) => {
     btn.addEventListener("click", () => toggleUserStatus(btn.dataset.id));
+  });
+  body.querySelectorAll("[data-action='toggle-premium']").forEach((btn) => {
+    btn.addEventListener("click", () => toggleUserPremium(btn.dataset.id));
   });
   body.querySelectorAll("[data-action='delete']").forEach((btn) => {
     btn.addEventListener("click", () => deleteUser(btn.dataset.id, btn.dataset.name));
@@ -281,13 +287,34 @@ function userRowHtml(u, withActions) {
       <td>${joined}</td>
       <td><span class="admin-badge ${badgeClass}">${escapeHtml(badgeLabel)}</span></td>
       ${withActions ? `
+      <td><span class="admin-badge ${u.is_premium ? "premium" : ""}">${u.is_premium ? "✨ Premium" : "Free"}</span></td>
       <td>
         <div class="admin-row-actions">
+          <button class="admin-icon-btn" data-action="toggle-premium" data-id="${u.id}" title="${u.is_premium ? "Downgrade to Free" : "Upgrade to Premium"}">${u.is_premium ? "✨" : "🆓"}</button>
           <button class="admin-icon-btn" data-action="toggle-status" data-id="${u.id}" title="${status === "suspended" ? "Reinstate" : "Suspend"}">${status === "suspended" ? "▶" : "⏸"}</button>
           <button class="admin-icon-btn danger" data-action="delete" data-id="${u.id}" data-name="${escapeAttr(u.full_name || u.email || "this user")}" title="Delete">🗑</button>
         </div>
       </td>` : ""}
     </tr>`;
+}
+
+async function toggleUserPremium(id) {
+  const target = allUsers.find((u) => u.id === id);
+  if (!target) return;
+  const newValue = !target.is_premium;
+
+  const { error } = await supabaseClient
+    .from("profiles")
+    .update({ is_premium: newValue, premium_since: newValue ? new Date().toISOString() : null })
+    .eq("id", id);
+
+  if (error) {
+    alert("Couldn't update plan: " + error.message);
+    return;
+  }
+  target.is_premium = newValue;
+  renderStats();
+  renderUsersTable(filterUsers(document.getElementById("admin-user-search").value));
 }
 
 async function toggleUserStatus(id) {

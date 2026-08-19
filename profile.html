@@ -32,6 +32,7 @@
     <!-- Left nav -->
     <div class="account-nav">
       <a href="#profile" class="active">Profile</a>
+      <a href="#plan">Plan</a>
       <a href="#notifications">Notifications</a>
       <a href="#security">Security</a>
       <a href="#support">Support</a>
@@ -73,6 +74,19 @@
         <input type="date" id="profile-dob" />
 
         <button id="save-profile-basics-btn" class="btn btn-primary">Save changes</button>
+      </div>
+
+      <!-- Plan -->
+      <div class="card account-section" id="plan">
+        <h3>Plan</h3>
+        <p class="muted">Your current HomeSync AI plan.</p>
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-top:8px;">
+          <div>
+            <span class="plan-badge free" id="plan-badge">Free</span>
+            <p class="field-hint" id="plan-hint" style="margin-top:8px;">Upgrade for unlimited matches, cross-city search, priority placement, and icebreakers.</p>
+          </div>
+          <a href="pricing.html" class="btn btn-primary" id="plan-cta-btn">Upgrade to Premium</a>
+        </div>
       </div>
 
       <!-- Notifications -->

@@ -79,6 +79,11 @@
         <div class="stat-card-val" id="admin-stat-messages">—</div>
         <div class="stat-card-label">Unread contact messages</div>
       </div>
+      <div class="card stat-card">
+        <div class="stat-card-top"><span class="stat-card-icon">✨</span></div>
+        <div class="stat-card-val" id="admin-stat-premium">—</div>
+        <div class="stat-card-label">Premium users</div>
+      </div>
     </div>
 
     <!-- Overview panel -->
@@ -121,15 +126,16 @@
           <button class="filter-chip" data-status-filter="active">Active</button>
           <button class="filter-chip" data-status-filter="suspended">Suspended</button>
           <button class="filter-chip" data-status-filter="admin">Admins</button>
+          <button class="filter-chip" data-status-filter="premium">Premium</button>
         </div>
       </div>
       <div class="admin-table-wrap">
         <table class="admin-table">
           <thead>
-            <tr><th>User</th><th>City</th><th>Budget</th><th>Joined</th><th>Status</th><th></th></tr>
+            <tr><th>User</th><th>City</th><th>Budget</th><th>Joined</th><th>Status</th><th>Plan</th><th></th></tr>
           </thead>
           <tbody id="admin-users-body">
-            <tr><td colspan="6" class="muted center">Loading…</td></tr>
+            <tr><td colspan="7" class="muted center">Loading…</td></tr>
           </tbody>
         </table>
       </div>

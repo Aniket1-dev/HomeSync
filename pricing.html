@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Premium — HomeSync AI</title>
+<meta name="robots" content="noindex, follow" />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/png" href="assets/favicon-64.png" />
+</head>
+<body>
+<script>(function(){try{if(localStorage.getItem('homesync-theme')==='light'){document.body.classList.add('light');}}catch(e){}})();</script>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div>
+    <button id="nav-toggle" class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="nav-links">
+      <button id="theme-toggle" class="theme-toggle" type="button" title="Toggle theme" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+      <a href="dashboard.html" id="nav-back-link">Matches</a>
+      <a href="#" id="logout-btn" class="btn btn-ghost">Sign out</a>
+    </div>
+  </div>
+</nav>
+
+<section class="wrap section-tight">
+  <div style="text-align:center; max-width:60ch; margin:0 auto 40px;">
+    <span class="eyebrow">Plans</span>
+    <h2 style="margin-bottom:10px;">Find your roommate faster.</h2>
+    <p class="muted" style="margin:0;">Free finds compatible people in your city. Premium widens the net, puts you first, and helps you break the ice.</p>
+  </div>
+
+  <div id="pricing-msg" class="msg hidden" style="max-width:640px; margin:0 auto 20px;"></div>
+
+  <div class="pricing-grid">
+    <!-- Free plan -->
+    <div class="card pricing-card">
+      <div class="pricing-plan-name">Free</div>
+      <div class="pricing-price">₹0<span>/forever</span></div>
+      <p class="muted" style="margin-bottom:18px;">Everything you need to get started.</p>
+      <ul class="pricing-feature-list">
+        <li>✅ Structured compatibility matching</li>
+        <li>✅ Up to 6 ranked matches</li>
+        <li>✅ Matching within your own city</li>
+        <li>✅ Email &amp; WhatsApp contact</li>
+        <li class="disabled">🚫 Unlimited matches</li>
+        <li class="disabled">🚫 Cross-city search</li>
+        <li class="disabled">🚫 Priority placement in others' lists</li>
+        <li class="disabled">🚫 Icebreaker suggestions</li>
+      </ul>
+      <button class="btn btn-ghost pricing-cta" id="btn-stay-free" disabled>Current plan</button>
+    </div>
+
+    <!-- Premium plan -->
+    <div class="card pricing-card pricing-card-premium">
+      <div class="pricing-plan-badge">✨ Most popular</div>
+      <div class="pricing-plan-name">Premium</div>
+      <div class="pricing-price">₹149<span>/month</span></div>
+      <p class="muted" style="margin-bottom:18px;">For a faster, wider, better-ranked search.</p>
+      <ul class="pricing-feature-list">
+        <li>✅ Everything in Free</li>
+        <li>✅ <strong>Unlimited</strong> ranked matches</li>
+        <li>✅ <strong>Cross-city</strong> search, not just your city</li>
+        <li>✅ <strong>Priority placement</strong> in other users' match lists</li>
+        <li>✅ <strong>Icebreaker suggestions</strong> for every match</li>
+        <li>✅ Premium badge on your profile</li>
+      </ul>
+      <button class="btn btn-primary pricing-cta" id="btn-upgrade">Upgrade to Premium</button>
+    </div>
+  </div>
+
+  <p class="muted" style="text-align:center; max-width:60ch; margin:24px auto 0; font-size:0.85rem;">
+    B.Tech Project-II prototype — this is a demo checkout, not a real payment. Upgrading instantly flips your account
+    to Premium so you can see the gated features in action.
+  </p>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>© 2026 HomeSync AI — B.Tech Project-II prototype</span>
+    <span>Aniket · Anchal Garg · Anant Saxena · Ayush Chauhan</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/pricing.js"></script>
+</body>
+</html>

@@ -643,13 +643,92 @@ footer { padding: 40px 0; border-top: 1px solid var(--line); }
   border: 1px solid var(--line);
   display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
 }
+.premium-banner.is-premium {
+  background: linear-gradient(120deg, rgba(16,185,129,0.20), rgba(16,185,129,0.06));
+  border-color: var(--sage);
+}
 .premium-banner-badge {
   display: inline-flex; align-items: center; gap: 6px; font-size: 0.74rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold); background: rgba(249,115,22,0.14);
   padding: 4px 10px; border-radius: 999px; margin-bottom: 8px;
 }
+.premium-banner-badge.is-premium { color: var(--sage); background: var(--sage-soft); }
 .premium-banner-title { font-weight: 700; margin-bottom: 2px; }
 .premium-banner-sub { font-size: 0.88rem; color: var(--ink-soft); margin: 0; }
+
+/* Plan badge — profile page, admin table, match cards */
+.plan-badge {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.03em; padding: 3px 10px; border-radius: 999px;
+  background: rgba(249,115,22,0.14); color: var(--gold);
+}
+.plan-badge.free { background: var(--canvas-raised); color: var(--ink-soft); border: 1px solid var(--line); }
+
+/* =========================================================
+   Pricing page
+   ========================================================= */
+.pricing-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;
+  max-width: 800px; margin: 0 auto;
+}
+@media (max-width: 700px) { .pricing-grid { grid-template-columns: 1fr; } }
+.pricing-card { position: relative; padding: 30px; }
+.pricing-card-premium { border-color: var(--sage); box-shadow: 0 0 0 1px var(--sage), var(--shadow-card); }
+.pricing-plan-badge {
+  position: absolute; top: -12px; right: 24px; font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; background: var(--sage); color: #06231A;
+  padding: 5px 12px; border-radius: 999px;
+}
+.pricing-plan-name { font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; }
+.pricing-price { font-family: var(--font-display); font-weight: 800; font-size: 2.2rem; margin-bottom: 4px; }
+.pricing-price span { font-size: 0.95rem; font-weight: 500; color: var(--ink-soft); }
+.pricing-feature-list { list-style: none; padding: 0; margin: 0 0 22px; display: flex; flex-direction: column; gap: 10px; font-size: 0.92rem; }
+.pricing-feature-list li.disabled { color: var(--ink-soft); }
+.pricing-cta { width: 100%; justify-content: center; }
+
+/* =========================================================
+   Premium gating on the dashboard match list
+   ========================================================= */
+.match-card.is-premium-user { border-color: var(--sage); }
+.match-priority-tag {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.03em; color: var(--sage); background: var(--sage-soft);
+  padding: 2px 8px; border-radius: 999px; margin-left: 8px; vertical-align: middle;
+}
+
+.locked-match-card {
+  position: relative; padding: 22px; border: 1px solid var(--line); border-radius: var(--radius-lg);
+  background: var(--canvas-raised); margin-bottom: 16px; overflow: hidden;
+}
+.locked-match-card-blur {
+  filter: blur(6px); opacity: 0.6; pointer-events: none;
+  display: grid; grid-template-columns: 78px 1fr; gap: 20px;
+}
+.locked-match-card-cta {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; text-align: center; padding: 16px;
+}
+.locked-match-card-cta .lock-icon { font-size: 1.4rem; }
+
+.upgrade-lock-chip {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; padding: 9px 16px;
+  border-radius: 999px; border: 1px dashed var(--line); color: var(--ink-soft); cursor: pointer; background: none;
+}
+.upgrade-lock-chip:hover { border-color: var(--gold); color: var(--gold); }
+
+.icebreaker-box {
+  margin-top: 14px; padding: 14px 16px; border-radius: var(--radius-sm); background: var(--sage-soft);
+  border: 1px solid var(--line); font-size: 0.9rem;
+}
+.icebreaker-box p { margin: 0 0 10px; }
+.icebreaker-actions { display: flex; gap: 8px; }
+.btn-icebreaker {
+  font-size: 0.82rem; font-weight: 600; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--canvas-raised); color: var(--ink); cursor: pointer;
+}
+.btn-icebreaker:hover { border-color: var(--sage); color: var(--sage); }
+.btn-icebreaker.locked { color: var(--ink-soft); }
+.btn-icebreaker.locked:hover { border-color: var(--gold); color: var(--gold); }
 
 .dash-layout { display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: start; }
 @media (max-width: 860px) { .dash-layout { grid-template-columns: 1fr; } }
@@ -695,7 +774,8 @@ footer { padding: 40px 0; border-top: 1px solid var(--line); }
 .admin-search input { margin-bottom: 0; padding-left: 38px; }
 .admin-search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--ink-soft); }
 
-.admin-stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.admin-stat-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 28px; }
+@media (max-width: 1100px) { .admin-stat-row { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 900px) { .admin-stat-row { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 520px) { .admin-stat-row { grid-template-columns: 1fr; } }
 
@@ -714,6 +794,7 @@ table.admin-table { width: 100%; border-collapse: collapse; min-width: 720px; }
 .admin-badge.active { background: var(--sage-soft); color: var(--sage); }
 .admin-badge.suspended { background: var(--danger-soft); color: var(--danger); }
 .admin-badge.admin { background: rgba(249,115,22,0.14); color: var(--gold); }
+.admin-badge.premium { background: var(--sage-soft); color: var(--sage); }
 .admin-row-actions { display: flex; gap: 8px; }
 .admin-icon-btn {
   width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line); background: var(--canvas);

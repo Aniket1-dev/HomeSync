@@ -4,6 +4,9 @@
 let me = null;
 let rankedMatches = [];
 let currentSort = "score";
+let cityScope = "city"; // "city" | "all" — "all" only ever active for premium users
+
+const FREE_MATCH_LIMIT = 6; // free users see this many unlocked match cards; rest are blurred
 
 const PROFILE_FIELDS_FOR_COMPLETENESS = [
   "full_name", "age", "gender", "mobile_number", "city", "preferred_area",
@@ -48,16 +51,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("edit-profile-link").href = "onboarding.html";
 
   renderCompleteness();
+  renderPremiumBanner();
+  wireCityScopeChip();
 
-  document.getElementById("premium-notify-btn")?.addEventListener("click", (e) => {
-    const btn = e.currentTarget;
-    btn.textContent = "You're on the list ✓";
-    btn.disabled = true;
-  });
-
-  document.querySelectorAll(".filter-chip").forEach((chip) => {
+  document.querySelectorAll(".filter-chip[data-sort]").forEach((chip) => {
     chip.addEventListener("click", () => {
-      document.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("active"));
+      document.querySelectorAll(".filter-chip[data-sort]").forEach((c) => c.classList.remove("active"));
       chip.classList.add("active");
       currentSort = chip.dataset.sort;
       renderSortedMatches();
@@ -66,6 +65,52 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await Promise.all([loadMatches(), loadBroadcastBanner()]);
 });
+
+function renderPremiumBanner() {
+  const banner = document.getElementById("premium-banner");
+  const badge = document.getElementById("premium-banner-badge");
+  const title = document.getElementById("premium-banner-title");
+  const sub = document.getElementById("premium-banner-sub");
+  const btn = document.getElementById("premium-banner-btn");
+
+  if (me.is_premium) {
+    banner.classList.add("is-premium");
+    badge.classList.add("is-premium");
+    badge.textContent = "✨ Premium";
+    title.textContent = "You're on HomeSync AI Premium";
+    sub.textContent = "Unlimited matches, cross-city search, priority placement, and icebreakers are all unlocked.";
+    btn.textContent = "Manage plan";
+    btn.href = "pricing.html";
+  } else {
+    banner.classList.remove("is-premium");
+    badge.classList.remove("is-premium");
+    badge.textContent = "✨ Upgrade";
+    title.textContent = "HomeSync AI Premium";
+    sub.textContent = "Unlock priority matching, unlimited cross-city search and icebreaker suggestions.";
+    btn.textContent = "Upgrade to Premium";
+    btn.href = "pricing.html";
+  }
+}
+
+function wireCityScopeChip() {
+  const chip = document.getElementById("city-scope-chip");
+  if (!chip) return;
+
+  if (!me.is_premium) {
+    chip.classList.add("upgrade-lock-chip");
+    chip.textContent = "🔒 All cities — Premium";
+    chip.addEventListener("click", () => {
+      window.location.href = "pricing.html";
+    });
+    return;
+  }
+
+  chip.addEventListener("click", () => {
+    cityScope = cityScope === "city" ? "all" : "city";
+    chip.textContent = cityScope === "city" ? "📍 My city" : "🌍 All cities";
+    loadMatches();
+  });
+}
 
 const DISMISSED_BROADCAST_KEY = "homesync-dismissed-broadcast";
 
@@ -121,11 +166,13 @@ async function loadMatches() {
   const list = document.getElementById("match-list");
   list.innerHTML = skeletonHtml(3);
 
-  const { data: candidates, error } = await supabaseClient
-    .from("profiles")
-    .select("*")
-    .neq("id", me.id)
-    .eq("city", me.city);
+  // Free users only ever search their own city. Premium users can toggle
+  // to "all cities" via the city-scope chip.
+  let query = supabaseClient.from("profiles").select("*").neq("id", me.id);
+  const crossCity = me.is_premium && cityScope === "all";
+  if (!crossCity) query = query.eq("city", me.city);
+
+  const { data: candidates, error } = await query;
 
   if (error) {
     list.innerHTML = `<div class="card empty-state"><div class="empty-state-icon">⚠️</div><p class="muted mt-0">Couldn't load matches: ${error.message}</p></div>`;
@@ -134,12 +181,19 @@ async function loadMatches() {
   }
 
   if (!candidates || candidates.length === 0) {
-    list.innerHTML = `<div class="card empty-state"><div class="empty-state-icon">🏠</div><p class="muted mt-0">No other profiles in ${escapeHtml(me.city)} yet. Invite your team/friends to sign up so the matching engine has data to work with.</p></div>`;
+    const scopeMsg = crossCity ? "No other profiles yet." : `No other profiles in ${escapeHtml(me.city)} yet.`;
+    list.innerHTML = `<div class="card empty-state"><div class="empty-state-icon">🏠</div><p class="muted mt-0">${scopeMsg} Invite your team/friends to sign up so the matching engine has data to work with.</p></div>`;
     setStatFallback();
     return;
   }
 
-  rankedMatches = rankMatches(me, candidates, 20);
+  // Premium candidates get a small ranking boost so they show up first in
+  // other users' match lists ("priority placement") — the underlying
+  // ruleScore/breakdown shown on the card itself is left untouched.
+  rankedMatches = rankMatches(me, candidates, crossCity ? 200 : 20).map((m) => ({
+    ...m,
+    displayScore: m.ruleScore + (m.profile.is_premium ? 8 : 0),
+  }));
 
   if (rankedMatches.length === 0) {
     list.innerHTML = `<div class="card empty-state"><div class="empty-state-icon">🤷</div><p class="muted mt-0">No compatible budget/location overlaps found yet.</p></div>`;
@@ -165,11 +219,39 @@ function renderSortedMatches() {
   if (currentSort === "budget") {
     sorted.sort((a, b) => (a.profile.budget_min ?? Infinity) - (b.profile.budget_min ?? Infinity));
   } else {
-    sorted.sort((a, b) => b.ruleScore - a.ruleScore);
+    sorted.sort((a, b) => b.displayScore - a.displayScore);
   }
 
   list.innerHTML = "";
-  sorted.forEach((m) => renderMatchCard(list, m));
+
+  const limit = me.is_premium ? sorted.length : FREE_MATCH_LIMIT;
+  sorted.slice(0, limit).forEach((m) => renderMatchCard(list, m));
+
+  const lockedCount = sorted.length - limit;
+  if (lockedCount > 0) {
+    renderLockedMatchTeaser(list, lockedCount);
+  }
+}
+
+function renderLockedMatchTeaser(list, lockedCount) {
+  const wrap = document.createElement("div");
+  wrap.className = "locked-match-card";
+  wrap.innerHTML = `
+    <div class="locked-match-card-blur">
+      <div class="skeleton skeleton-circle"></div>
+      <div>
+        <div class="skeleton skeleton-line" style="width:40%;"></div>
+        <div class="skeleton skeleton-line" style="width:70%;"></div>
+        <div class="skeleton skeleton-line" style="width:55%;"></div>
+      </div>
+    </div>
+    <div class="locked-match-card-cta">
+      <span class="lock-icon">🔒</span>
+      <div><strong>${lockedCount} more match${lockedCount === 1 ? "" : "es"}</strong> waiting behind Premium</div>
+      <a href="pricing.html" class="btn btn-primary" style="margin-top:4px;">Unlock unlimited matches</a>
+    </div>
+  `;
+  list.appendChild(wrap);
 }
 
 function skeletonHtml(n) {
@@ -192,6 +274,7 @@ function renderMatchCard(list, match) {
   const { profile, ruleScore, breakdown } = match;
   const card = document.createElement("div");
   card.className = "card match-card";
+  if (profile.is_premium) card.classList.add("is-premium-user");
 
   const dial = document.createElement("div");
   dial.className = "mini-dial";
@@ -204,6 +287,7 @@ function renderMatchCard(list, match) {
     <div class="match-header-row">
       <div class="match-avatar" style="${avatarStyle}">${profile.photo_url ? "" : initials(profile.full_name)}</div>
       <div class="match-name" style="margin-bottom:0;">${escapeHtml(profile.full_name || "Unnamed")}</div>
+      ${profile.is_premium ? `<span class="match-priority-tag">⭐ Priority</span>` : ""}
     </div>
     <p class="muted mt-0" style="margin-bottom:8px;">${escapeHtml(profile.preferred_area || profile.city || "")} · ₹${profile.budget_min || "?"}–₹${profile.budget_max || "?"}</p>
     <p style="margin-bottom:0;">${escapeHtml((profile.bio || "").slice(0, 160))}${profile.bio && profile.bio.length > 160 ? "…" : ""}</p>
@@ -214,6 +298,8 @@ function renderMatchCard(list, match) {
       <span>vibe ${pct(breakdown.personality)}</span>
     </div>
     ${renderContactRow(profile)}
+    ${renderIcebreakerButton(profile)}
+    <div class="icebreaker-box hidden" id="icebreaker-${escapeAttr(profile.id)}"></div>
   `;
 
   card.appendChild(dial);
@@ -222,6 +308,73 @@ function renderMatchCard(list, match) {
   list.appendChild(card);
 
   renderSyncDial(dial, ruleScore, { size: 78, label: "" });
+
+  const icebreakerBtn = info.querySelector("[data-action='icebreaker']");
+  icebreakerBtn?.addEventListener("click", () => handleIcebreakerClick(profile));
+}
+
+function renderIcebreakerButton(profile) {
+  if (!me.is_premium) {
+    return `<button type="button" class="btn-icebreaker locked" data-action="icebreaker" style="margin-top:12px;">🔒 Icebreaker suggestion — Premium</button>`;
+  }
+  return `<button type="button" class="btn-icebreaker" data-action="icebreaker" style="margin-top:12px;">✨ Suggest an icebreaker</button>`;
+}
+
+function handleIcebreakerClick(profile) {
+  if (!me.is_premium) {
+    window.location.href = "pricing.html";
+    return;
+  }
+
+  const box = document.getElementById(`icebreaker-${profile.id}`);
+  if (!box) return;
+
+  if (!box.classList.contains("hidden")) {
+    box.classList.add("hidden");
+    return;
+  }
+
+  const text = generateIcebreaker(me, profile);
+  box.innerHTML = `
+    <p>${escapeHtml(text)}</p>
+    <div class="icebreaker-actions">
+      <button type="button" class="btn-icebreaker" data-action="copy">📋 Copy</button>
+      <button type="button" class="btn-icebreaker" data-action="regen">🔁 Another one</button>
+    </div>
+  `;
+  box.classList.remove("hidden");
+
+  box.querySelector("[data-action='copy']").addEventListener("click", (e) => {
+    navigator.clipboard?.writeText(text);
+    e.currentTarget.textContent = "Copied ✓";
+    setTimeout(() => (e.currentTarget.textContent = "📋 Copy"), 1500);
+  });
+  box.querySelector("[data-action='regen']").addEventListener("click", () => {
+    box.querySelector("p").textContent = generateIcebreaker(me, profile);
+  });
+}
+
+/**
+ * Lightweight, fully local icebreaker generator — a Premium perk that
+ * doesn't need an LLM key or network call. Picks a template based on
+ * what the two profiles actually have in common (city, budget, top
+ * compatibility field) so it doesn't read as generic filler.
+ */
+function generateIcebreaker(me, profile) {
+  const name = (profile.full_name || "there").split(" ")[0];
+  const sameArea = profile.preferred_area && profile.preferred_area === me.preferred_area;
+  const sameCleanliness = profile.cleanliness != null && me.cleanliness != null && Math.abs(profile.cleanliness - me.cleanliness) <= 1;
+  const sameCooking = profile.cooking_habits && profile.cooking_habits === me.cooking_habits;
+
+  const templates = [
+    `Hey ${name}! We matched pretty high on HomeSync — I'm looking around ${escapeHtml(me.preferred_area || me.city || "the same area")} too, budget's roughly ₹${me.budget_min || "?"}–₹${me.budget_max || "?"}. Open to a quick chat?`,
+    `Hi ${name}, our lifestyle answers lined up well on HomeSync AI. Want to compare notes on the flat-hunt and see if it's worth meeting up?`,
+  ];
+  if (sameArea) templates.push(`Hey ${name}! Looks like we're both eyeing ${escapeHtml(profile.preferred_area)} — small world. Want to team up on the search?`);
+  if (sameCleanliness) templates.push(`Hi ${name}, seems like we're on the same page about tidiness levels, which is honestly the thing that makes or breaks a flatshare. Want to chat?`);
+  if (sameCooking) templates.push(`Hey ${name}! We matched well, and looks like our cooking habits line up too — always a good sign for a shared kitchen. Down to talk?`);
+
+  return templates[Math.floor(Math.random() * templates.length)];
 }
 
 function renderContactRow(profile) {

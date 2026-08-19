@@ -28,6 +28,8 @@ create table if not exists public.profiles (
   dark_mode boolean default false,
   is_admin boolean default false,
   status text default 'active' check (status in ('active','suspended')),
+  is_premium boolean default false,
+  premium_since timestamptz,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -45,6 +47,8 @@ create table if not exists public.profiles (
 -- alter table public.profiles add column if not exists dark_mode boolean default false;
 -- alter table public.profiles add column if not exists is_admin boolean default false;
 -- alter table public.profiles add column if not exists status text default 'active' check (status in ('active','suspended'));
+-- alter table public.profiles add column if not exists is_premium boolean default false;
+-- alter table public.profiles add column if not exists premium_since timestamptz;
 
 alter table public.profiles enable row level security;
 
@@ -92,6 +96,20 @@ create policy "admins can delete any profile"
   on public.profiles for delete
   to authenticated
   using (public.is_admin());
+
+-- ============================================================
+-- Premium plan
+-- ------------------------------------------------------------
+-- `is_premium` unlocks unlimited matches, cross-city search, priority
+-- placement in other users' match lists, and icebreaker suggestions
+-- (see pricing.html / js/pricing.js). This prototype has no real payment
+-- gateway wired up, so "upgrading" just self-serve flips this flag from
+-- the client (allowed because of the "users can update own profile"
+-- policy above) — fine for a demo/thesis project, but before any real
+-- money changes hands this flag should only ever be set from a trusted
+-- server (e.g. a webhook from Razorpay/Stripe using the service_role key),
+-- not from client-side code.
+-- ============================================================
 
 -- Optional: table to cache LLM bio-compatibility results so you don't
 -- re-call the API for the same pair every dashboard load.

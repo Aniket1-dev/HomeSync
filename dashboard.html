@@ -73,14 +73,14 @@
     </div>
   </div>
 
-  <!-- Premium upsell banner -->
-  <div class="premium-banner">
+  <!-- Premium banner (state set by dashboard.js depending on me.is_premium) -->
+  <div class="premium-banner" id="premium-banner">
     <div>
-      <div class="premium-banner-badge">✨ Coming soon</div>
-      <div class="premium-banner-title">HomeSync AI Premium</div>
-      <p class="premium-banner-sub">Unlock priority matching, unlimited cross-city search and AI-written icebreakers — free for the B.Tech prototype cohort.</p>
+      <div class="premium-banner-badge" id="premium-banner-badge">✨ Premium</div>
+      <div class="premium-banner-title" id="premium-banner-title">HomeSync AI Premium</div>
+      <p class="premium-banner-sub" id="premium-banner-sub">Unlock priority matching, unlimited cross-city search and icebreaker suggestions.</p>
     </div>
-    <button class="btn btn-primary" id="premium-notify-btn">Notify me</button>
+    <a class="btn btn-primary" id="premium-banner-btn" href="pricing.html">Upgrade to Premium</a>
   </div>
 
   <div class="dash-layout">
@@ -89,6 +89,7 @@
       <a href="#matches" class="active">🤝 Matches</a>
       <a href="onboarding.html">🌙 Lifestyle profile</a>
       <a href="profile.html">👤 My account</a>
+      <a href="pricing.html">✨ Premium</a>
       <a href="faq.html">❓ FAQ</a>
       <a href="contact.html">✉️ Support</a>
     </div>
@@ -100,6 +101,7 @@
         <div class="filter-chip-row">
           <button class="filter-chip active" data-sort="score">Best score</button>
           <button class="filter-chip" data-sort="budget">Lowest budget</button>
+          <button class="filter-chip" id="city-scope-chip" data-scope="city">📍 My city</button>
         </div>
       </div>
 

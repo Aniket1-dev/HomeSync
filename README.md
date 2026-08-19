@@ -162,6 +162,15 @@ homesync-ai/
 - **Section 4** (shortlist-then-LLM architecture) → `rankMatches()` returns the
   top-N rule-scored shortlist that Part 4's LLM call would run on
 
+## Premium plan
+
+A gated Premium tier is built in:
+
+- **Free**: matching within your own city, top 6 ranked matches.
+- **Premium**: unlimited matches, cross-city search (toggle chip on the dashboard), priority placement in other users' match lists (small ranking boost + a "⭐ Priority" tag), and per-match icebreaker suggestions (generated locally in `js/dashboard.js`, no API key needed).
+
+There's no real payment gateway wired up — `pricing.html` / `js/pricing.js` just flips `profiles.is_premium` on your own row (the RLS policy allows this for a demo). Admins can also toggle any user's plan from **Admin Portal → Users** (✨/🆓 icon). Run the `is_premium` / `premium_since` columns from `sql/schema.sql` (or the migration block) before using it. See the comment above those columns in the schema for the caveat about wiring this to a real gateway later.
+
 ## Next upgrades (for scaling beyond the prototype)
 
 - Move matching computation to a Postgres function or Edge Function so it scales past a few hundred profiles (client-side ranking is fine for a demo/thesis dataset).
