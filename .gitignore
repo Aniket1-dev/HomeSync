@@ -2,3 +2,7 @@
 Thumbs.db
 *.log
 .vscode/
+node_modules/
+mobile-www/
+android/
+ios/
