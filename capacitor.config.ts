@@ -3,7 +3,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'ai.homesync.app',
   appName: 'HomeSync AI',
-  webDir: '.',
+  webDir: 'mobile-www',
   bundledWebRuntime: false,
   server: {
     androidScheme: 'https'
