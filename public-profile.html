@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roommate profile — HomeSync AI</title>
+<link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/light-dashboard.css">
+<style>
+.public-profile{max-width:900px;margin:42px auto}.profile-hero{display:grid;grid-template-columns:110px 1fr auto;gap:22px;align-items:center}.public-avatar{width:110px;height:110px;border-radius:28px;background:var(--sage,#8ba98d);display:grid;place-items:center;font-size:32px;font-weight:800;background-size:cover;background-position:center}.profile-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.pill{padding:6px 10px;border:1px solid var(--line);border-radius:999px;font-size:13px}.profile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:20px}.info-card{padding:20px}.info-card h4{margin:0 0 8px}.compat{font-size:42px;font-weight:800}.privacy{padding:14px 16px;border-radius:12px;background:rgba(120,170,130,.12);border:1px solid var(--line);margin-top:20px}.back{margin-bottom:18px}@media(max-width:700px){.profile-hero{grid-template-columns:78px 1fr}.public-avatar{width:78px;height:78px;border-radius:20px}.profile-hero .profile-action{grid-column:1/-1}.profile-grid{grid-template-columns:1fr}}
+</style></head>
+<body>
+<nav class="nav"><div class="nav-inner"><div class="brand"><img src="assets/logo-transparent.png" class="brand-mark" style="background:none"> HomeSync AI</div><div class="nav-links"><a href="dashboard.html">Matches</a><a href="profile.html">My account</a></div></div></nav>
+<main class="wrap public-profile"><a class="back" href="dashboard.html">← Back to matches</a><div id="profile-root"><div class="card"><p>Loading profile…</p></div></div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script><script src="js/supabaseClient.js"></script><script src="js/ui.js"></script><script src="js/public-profile.js?v=20260819-1"></script>
+</body></html>
