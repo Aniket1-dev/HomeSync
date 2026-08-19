@@ -1,109 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>FAQ — HomeSync AI</title>
-<meta name="description" content="Frequently asked questions about how HomeSync AI matches roommates, privacy, and how to get started." />
-<meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://homesync.ai/faq.html" />
-<link rel="stylesheet" href="css/style.css" />
-<link rel="icon" type="image/png" href="assets/favicon-64.png" />
-</head>
-<body>
-<script>(function(){try{if(localStorage.getItem('homesync-theme')==='light'){document.body.classList.add('light');}}catch(e){}})();</script>
-
-<nav class="nav">
-  <div class="nav-inner">
-    <div class="brand"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div>
-    <button id="nav-toggle" class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
-    <div class="nav-links" id="nav-links">
-      <button id="theme-toggle" class="theme-toggle" type="button" title="Toggle theme" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
-      <a href="index.html#how-it-works">How it works</a>
-      <a href="index.html#team">Team</a>
-      <a href="login.html" class="btn btn-ghost">Sign in</a>
-    </div>
-  </div>
-</nav>
-
-<section class="wrap section-tight" style="max-width:680px;">
-  <span class="eyebrow">FAQ</span>
-  <h2 style="margin-bottom:24px;">Frequently asked questions</h2>
-
-  <div class="card" style="padding:8px 24px;">
-    <div class="faq-item">
-      <button class="faq-question">How does the matching score actually work? <span class="faq-chevron">▾</span></button>
-      <div class="faq-answer"><p>We compare your sleep schedule, cleanliness, guest frequency, personality, and a few other lifestyle traits against every other profile in your city, weighting each trait by how much it tends to matter for shared living. Budget and city are hard filters — if they don't overlap, you won't see that match.</p></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">Is HomeSync AI free? <span class="faq-chevron">▾</span></button>
-      <div class="faq-answer"><p>Yes — this is a free student prototype built for a B.Tech Project-II, not a commercial product. No payment details are ever requested.</p></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">Who can see my profile? <span class="faq-chevron">▾</span></button>
-      <div class="faq-answer"><p>Any other signed-in user of the app can see your profile, since that's needed for the matching engine to work. Your mobile number and email are only shown on match cards, so you can be reached by people you're actually matched with.</p></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">How do I contact a match? <span class="faq-chevron">▾</span></button>
-      <div class="faq-answer"><p>Once you match with someone, their card on your dashboard shows Email and WhatsApp buttons pre-filled with an intro message, so you can reach out directly.</p></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">Is it safe to meet someone I matched with? <span class="faq-chevron">▾</span></button>
-      <div class="faq-answer"><p>We don't verify user identities. Always meet in a public place first, tell a friend where you're going, and use your own judgement before entering any living arrangement.</p></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">Can I delete my account? <span class="faq-chevron">▾</span></button>
-      <div class="faq-answer"><p>Yes — go to My Account → Account actions → Delete account. This removes your profile and match data. Note that as a student prototype, full underlying account deletion currently requires reaching out to support.</p></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">I didn't get my confirmation email — what do I do? <span class="faq-chevron">▾</span></button>
-      <div class="faq-answer"><p>Check your spam folder first. If it's still missing, reach out via the <a href="contact.html">contact page</a> and we'll verify your account manually.</p></div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap">
-    <div class="footer-inner">
-      <div>
-        <div class="brand" style="margin-bottom:10px;"><img src="assets/logo-transparent.png" alt="" class="brand-mark" style="background:none;" /> HomeSync AI</div>
-        <p style="max-width:32ch; margin:0;">Roommate matching for students, scored on how you actually live — not just where you want to live.</p>
-      </div>
-      <div class="footer-cols">
-        <div class="footer-col">
-          <h4>Product</h4>
-          <a href="index.html#how-it-works">How it works</a>
-          <a href="index.html#team">Team</a>
-          <a href="login.html">Sign in</a>
-        </div>
-        <div class="footer-col">
-          <h4>Company</h4>
-          <a href="about.html">About</a>
-          <a href="contact.html">Contact</a>
-          <a href="faq.html">FAQ</a>
-        </div>
-        <div class="footer-col">
-          <h4>Legal</h4>
-          <a href="legal.html#privacy">Privacy Policy</a>
-          <a href="legal.html#terms">Terms &amp; Conditions</a>
-          <a href="legal.html#disclaimer">Disclaimer</a>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 HomeSync AI — B.Tech Project-II prototype</span>
-      <span>Aniket · Anchal Garg · Anant Saxena · Ayush Chauhan</span>
-    </div>
-  </div>
-</footer>
-
-<script>
-  document.querySelectorAll(".faq-question").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      btn.parentElement.classList.toggle("open");
-    });
-  });
-</script>
-<script src="js/theme.js"></script>
-</body>
-</html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FAQ — HomeSync AI</title><meta name="description" content="HomeSync AI FAQ: matching, KYC, privacy, rooms, maps, merge requests, chat, Premium and safety."><link rel="stylesheet" href="css/style.css"><link rel="icon" href="assets/favicon-64.png"></head>
+<body><script>(function(){try{if(localStorage.getItem('homesync-theme')==='light')document.body.classList.add('light')}catch(e){}})();</script>
+<nav class="nav"><div class="nav-inner"><div class="brand"><img src="assets/logo-transparent.png" class="brand-mark" alt=""> HomeSync AI</div><button id="nav-toggle" class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button><div class="nav-links" id="nav-links"><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg></button><a href="how-to-use.html">How to use</a><a href="index.html#how-it-works">How it works</a><a href="login.html" class="btn btn-ghost">Sign in</a></div></div></nav>
+<main class="wrap section-tight" style="max-width:900px"><span class="eyebrow">HELP CENTER</span><h1>Frequently asked questions</h1><p class="muted" style="max-width:70ch">Everything you need to understand HomeSync before you trust a match, upload KYC, visit a room or decide to merge households.</p>
+<div class="faq-grid">
+<section><h3>Matching & profiles</h3><div class="card faq-card">
+<details open><summary>How is my roommate compatibility calculated?</summary><p>HomeSync uses your lifestyle answers and practical preferences to rank profiles. The current questionnaire focuses on sleep, cleanliness, guests, personality, smoking/drinking, cooking and conflict style, alongside practical fit such as city and budget. A score is a compatibility signal, not a guarantee.</p></details>
+<details><summary>Why did my top match change?</summary><p>Matching is dynamic. If you or another user changes lifestyle answers, budget, city, move timing or profile information, the ranking can change. Your friend should keep their profile honest rather than changing answers simply to increase a score.</p></details>
+<details><summary>Why can't I find someone even though our answers look similar?</summary><p>Similarity alone is not enough. Location, budget, profile completeness and other practical constraints can affect eligibility. Premium can expand discovery across cities, but it does not artificially increase compatibility.</p></details>
+<details><summary>What should I put in my profile?</summary><p>Use a real name, current city and area, realistic budget, move-in timing, a useful bio, lifestyle answers and a genuine photo if you choose to add one. Accurate information produces more useful matches.</p></details>
+</div></section>
+<section><h3>KYC & verification</h3><div class="card faq-card">
+<details><summary>What is KYC on HomeSync?</summary><p>KYC is HomeSync's manual identity-verification workflow. You upload an accepted identity document through the private KYC page. An authorized administrator reviews the submission and can approve it, reject it or request resubmission.</p></details>
+<details><summary>Where do I upload my KYC document?</summary><p>Open <strong>My Profile / Account → Identity & KYC</strong>, or use the KYC entry in the Workspace menu. Upload a clear supported document and submit it for review.</p></details>
+<details><summary>Is my identity document public?</summary><p>No. The document is intended to remain in private storage and should not be displayed on your public roommate profile. Only the verification status/badge should be exposed to other users.</p></details>
+<details><summary>Does uploading a document automatically verify me?</summary><p>No. Uploading means submitted for review. Only an authorized admin approval should result in a verified status.</p></details>
+</div></section>
+<section><h3>Rooms, location & maps</h3><div class="card faq-card">
+<details><summary>How do I add my exact location?</summary><p>Use the location section in your profile or room listing. Keep the public location as precise as you are comfortable with. Exact private location data should only be shared when necessary and with appropriate consent.</p></details>
+<details><summary>What can I check about a room?</summary><p>Review rent, deposit, maintenance, electricity rate, availability, room type and the available room/safety verification information. Treat estimates as estimates until you inspect the room and confirm original documents.</p></details>
+<details><summary>Can HomeSync calculate the cost of living around a room?</summary><p>The platform can surface available area intelligence such as rent and utility estimates and can use those values in decision support. Estimates are not a guaranteed bill; confirm tariffs and recurring charges locally.</p></details>
+<details><summary>How do I navigate to a room or meeting point?</summary><p>When a listing or agreed meeting location provides coordinates, use the map/navigation action to open directions in your supported maps application. Do not rely on an unverified pin as proof that a room exists.</p></details>
+</div></section>
+<section><h3>Merge requests & chat</h3><div class="card faq-card">
+<details><summary>What is a merge request?</summary><p>A merge request is a structured request to explore becoming roommates with another user. It is not a lease, payment commitment or automatic acceptance.</p></details>
+<details><summary>What happens after a merge request is accepted?</summary><p>The accepted relationship can unlock the private roommate communication flow. Use chat to discuss budget, room options, expectations, visits and next steps before making commitments.</p></details>
+<details><summary>Can I share my live location?</summary><p>Location sharing should be consent-based and used only when necessary, such as coordinating an agreed visit. Never share sensitive location information publicly.</p></details>
+<details><summary>Can I report a suspicious profile or room?</summary><p>Yes. Use the available Trust & Safety/reporting controls and provide specific evidence. Do not confront a suspicious user or send money simply because a listing or profile looks convincing.</p></details>
+</div></section>
+<section><h3>Premium</h3><div class="card faq-card">
+<details><summary>What does Premium unlock?</summary><p>Premium is designed around discovery and decision support: broader/cross-city discovery, more matches, priority visibility/boosting, advanced filters, saved searches and alerts, profile-view insights, match comparison, private shortlists, relocation planning, room-cost decision support and Premium concierge workflows where available.</p></details>
+<details><summary>Does Premium make my compatibility score higher?</summary><p>No. Premium should improve access to tools and discovery, not fabricate compatibility or turn an incompatible person into a compatible one.</p></details>
+<details><summary>Why can't I see a match after switching plans?</summary><p>Check the city scope, filters, profile status and current profile data. A plan change should not remove an otherwise eligible match; if something looks inconsistent, refresh the dashboard and contact support with the affected profile details.</p></details>
+</div></section>
+<section><h3>Privacy, notifications & account</h3><div class="card faq-card">
+<details><summary>Why am I receiving notifications?</summary><p>Notifications can relate to matching activity, profile views, merge requests, chat/roommate activity, verification or other account events. Use your notification controls to manage what you receive where those controls are available.</p></details>
+<details><summary>Can I switch between dark and bright mode?</summary><p>Yes. Use the theme control in the navigation. HomeSync stores your selected theme so it can persist between supported pages.</p></details>
+<details><summary>Can I change my lifestyle answers later?</summary><p>Yes. Revisit your match profile/lifestyle questionnaire, update the answers honestly and save them. Your compatibility rankings can update after the change.</p></details>
+<details><summary>Can I delete my account?</summary><p>Use the account controls available in your Profile. If the prototype requires administrative assistance for complete deletion, contact Support rather than assuming that hiding a profile deletes the underlying account.</p></details>
+</div></section>
+<section><h3>Safety first</h3><div class="card faq-card"><div class="notice" style="padding:16px;border:1px solid var(--line);border-radius:14px"><strong>HomeSync is a matching and decision-support platform.</strong><p style="margin:8px 0 0">A match, Premium badge, KYC approval or room listing does not guarantee a safe person, genuine property, legal tenancy, accurate rent, or successful roommate relationship. Meet safely, verify documents, inspect the room and confirm all financial/legal terms before paying or signing anything.</p></div></div></section>
+<p style="margin-top:28px"><a class="btn btn-primary" href="how-to-use.html">Read the complete How to Use guide →</a> <a class="btn btn-ghost" href="contact.html">Contact support</a></p>
+</main><footer><div class="wrap footer-inner"><span>© 2026 HomeSync AI — B.Tech Project-II</span><span><a href="how-to-use.html">How to use</a> · <a href="faq.html">FAQ</a> · <a href="contact.html">Support</a></span></div></footer><script src="js/theme.js"></script></body></html>
