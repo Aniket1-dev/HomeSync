@@ -7,6 +7,7 @@ on:
     paths:
       - 'package.json'
       - 'capacitor.config.ts'
+      - 'scripts/prepare-mobile.mjs'
       - '**.html'
       - 'css/**'
       - 'js/**'
@@ -33,6 +34,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm install
+      - name: Prepare web bundle
+        run: npm run mobile:prepare
       - name: Add Android platform
         run: npx cap add android
       - name: Sync web app
@@ -59,6 +62,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm install
+      - name: Prepare web bundle
+        run: npm run mobile:prepare
       - name: Add iOS platform
         run: npx cap add ios
       - name: Sync web app
