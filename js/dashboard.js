@@ -16,9 +16,7 @@ const PROFILE_FIELDS_FOR_COMPLETENESS = [
 ];
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const {
-    data: { user },
-  } = await supabaseClient.auth.getUser();
+  const { data: { user } } = await supabaseClient.auth.getUser();
 
   if (!user) {
     window.location.href = "login.html";
@@ -40,6 +38,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = "admin.html";
     return;
   }
+
+  // Keep Premium state consistent with the plan activation timestamp. This
+  // prevents an older profile row from being treated as Free after upgrade.
+  myProfile.is_premium = myProfile.is_premium === true || Boolean(myProfile.premium_since);
   me = myProfile;
 
   document.getElementById("welcome-name").textContent = myProfile.full_name?.split(" ")[0] || "there";
@@ -48,7 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await supabaseClient.auth.signOut();
     window.location.href = "login.html";
   });
-  document.getElementById("edit-profile-link").href = "onboarding.html";
+  document.getElementById("edit-profile-link")?.setAttribute("href", "onboarding.html");
 
   renderCompleteness();
   renderPremiumBanner();
@@ -76,7 +78,7 @@ function renderPremiumBanner() {
   if (me.is_premium) {
     banner.classList.add("is-premium");
     badge.classList.add("is-premium");
-    badge.textContent = "✨ Premium";
+    badge.textContent = "✨ Premium active";
     title.textContent = "You're on HomeSync AI Premium";
     sub.textContent = "Unlimited matches, cross-city search, priority placement, and icebreakers are all unlocked.";
     btn.textContent = "Manage plan";
@@ -126,11 +128,7 @@ async function loadBroadcastBanner() {
   if (error || !data) return;
 
   let dismissedId = null;
-  try {
-    dismissedId = localStorage.getItem(DISMISSED_BROADCAST_KEY);
-  } catch (e) {
-    /* localStorage unavailable */
-  }
+  try { dismissedId = localStorage.getItem(DISMISSED_BROADCAST_KEY); } catch (e) {}
   if (dismissedId === data.id) return;
 
   const banner = document.getElementById("broadcast-banner");
@@ -140,11 +138,7 @@ async function loadBroadcastBanner() {
 
   document.getElementById("broadcast-banner-dismiss").addEventListener("click", () => {
     banner.classList.add("hidden");
-    try {
-      localStorage.setItem(DISMISSED_BROADCAST_KEY, data.id);
-    } catch (e) {
-      /* localStorage unavailable — banner just reappears next visit */
-    }
+    try { localStorage.setItem(DISMISSED_BROADCAST_KEY, data.id); } catch (e) {}
   });
 }
 
@@ -166,8 +160,6 @@ async function loadMatches() {
   const list = document.getElementById("match-list");
   list.innerHTML = skeletonHtml(3);
 
-  // Free users only ever search their own city. Premium users can toggle
-  // to "all cities" via the city-scope chip.
   let query = supabaseClient.from("profiles").select("*").neq("id", me.id);
   const crossCity = me.is_premium && cityScope === "all";
   if (!crossCity) query = query.eq("city", me.city);
@@ -187,9 +179,10 @@ async function loadMatches() {
     return;
   }
 
-  // Premium candidates get a small ranking boost so they show up first in
-  // other users' match lists ("priority placement") — the underlying
-  // ruleScore/breakdown shown on the card itself is left untouched.
+  candidates.forEach((candidate) => {
+    candidate.is_premium = candidate.is_premium === true || Boolean(candidate.premium_since);
+  });
+
   rankedMatches = rankMatches(me, candidates, crossCity ? 200 : 20).map((m) => ({
     ...m,
     displayScore: m.ruleScore + (m.profile.is_premium ? 8 : 0),
@@ -203,7 +196,6 @@ async function loadMatches() {
 
   document.getElementById("stat-match-count").textContent = rankedMatches.length;
   document.getElementById("stat-top-score").textContent = Math.round(rankedMatches[0].ruleScore) + "%";
-
   renderSortedMatches();
 }
 
@@ -215,58 +207,26 @@ function setStatFallback() {
 function renderSortedMatches() {
   const list = document.getElementById("match-list");
   const sorted = [...rankedMatches];
-
-  if (currentSort === "budget") {
-    sorted.sort((a, b) => (a.profile.budget_min ?? Infinity) - (b.profile.budget_min ?? Infinity));
-  } else {
-    sorted.sort((a, b) => b.displayScore - a.displayScore);
-  }
+  if (currentSort === "budget") sorted.sort((a, b) => (a.profile.budget_min ?? Infinity) - (b.profile.budget_min ?? Infinity));
+  else sorted.sort((a, b) => b.displayScore - a.displayScore);
 
   list.innerHTML = "";
-
   const limit = me.is_premium ? sorted.length : FREE_MATCH_LIMIT;
   sorted.slice(0, limit).forEach((m) => renderMatchCard(list, m));
-
   const lockedCount = sorted.length - limit;
-  if (lockedCount > 0) {
-    renderLockedMatchTeaser(list, lockedCount);
-  }
+  if (lockedCount > 0) renderLockedMatchTeaser(list, lockedCount);
 }
 
 function renderLockedMatchTeaser(list, lockedCount) {
   const wrap = document.createElement("div");
   wrap.className = "locked-match-card";
-  wrap.innerHTML = `
-    <div class="locked-match-card-blur">
-      <div class="skeleton skeleton-circle"></div>
-      <div>
-        <div class="skeleton skeleton-line" style="width:40%;"></div>
-        <div class="skeleton skeleton-line" style="width:70%;"></div>
-        <div class="skeleton skeleton-line" style="width:55%;"></div>
-      </div>
-    </div>
-    <div class="locked-match-card-cta">
-      <span class="lock-icon">🔒</span>
-      <div><strong>${lockedCount} more match${lockedCount === 1 ? "" : "es"}</strong> waiting behind Premium</div>
-      <a href="pricing.html" class="btn btn-primary" style="margin-top:4px;">Unlock unlimited matches</a>
-    </div>
-  `;
+  wrap.innerHTML = `<div class="locked-match-card-blur"><div class="skeleton skeleton-circle"></div><div><div class="skeleton skeleton-line" style="width:40%;"></div><div class="skeleton skeleton-line" style="width:70%;"></div><div class="skeleton skeleton-line" style="width:55%;"></div></div></div><div class="locked-match-card-cta"><span class="lock-icon">🔒</span><div><strong>${lockedCount} more match${lockedCount === 1 ? "" : "es"}</strong> waiting behind Premium</div><a href="pricing.html" class="btn btn-primary" style="margin-top:4px;">Unlock unlimited matches</a></div>`;
   list.appendChild(wrap);
 }
 
 function skeletonHtml(n) {
   let html = "";
-  for (let i = 0; i < n; i++) {
-    html += `
-      <div class="skeleton-card">
-        <div class="skeleton skeleton-circle"></div>
-        <div>
-          <div class="skeleton skeleton-line" style="width:40%;"></div>
-          <div class="skeleton skeleton-line" style="width:70%;"></div>
-          <div class="skeleton skeleton-line" style="width:55%;"></div>
-        </div>
-      </div>`;
-  }
+  for (let i = 0; i < n; i++) html += `<div class="skeleton-card"><div class="skeleton skeleton-circle"></div><div><div class="skeleton skeleton-line" style="width:40%;"></div><div class="skeleton skeleton-line" style="width:70%;"></div><div class="skeleton skeleton-line" style="width:55%;"></div></div></div>`;
   return html;
 }
 
@@ -278,144 +238,61 @@ function renderMatchCard(list, match) {
 
   const dial = document.createElement("div");
   dial.className = "mini-dial";
-
   const info = document.createElement("div");
-  const avatarStyle = profile.photo_url
-    ? `background-image:url(${escapeAttr(profile.photo_url)});`
-    : `background:${avatarColor(profile.id)};`;
-  info.innerHTML = `
-    <div class="match-header-row">
-      <div class="match-avatar" style="${avatarStyle}">${profile.photo_url ? "" : initials(profile.full_name)}</div>
-      <div class="match-name" style="margin-bottom:0;">${escapeHtml(profile.full_name || "Unnamed")}</div>
-      ${profile.is_premium ? `<span class="match-priority-tag">⭐ Priority</span>` : ""}
-    </div>
-    <p class="muted mt-0" style="margin-bottom:8px;">${escapeHtml(profile.preferred_area || profile.city || "")} · ₹${profile.budget_min || "?"}–₹${profile.budget_max || "?"}</p>
-    <p style="margin-bottom:0;">${escapeHtml((profile.bio || "").slice(0, 160))}${profile.bio && profile.bio.length > 160 ? "…" : ""}</p>
-    <div class="score-breakdown">
-      <span>sleep ${pct(breakdown.sleep_schedule)}</span>
-      <span>clean ${pct(breakdown.cleanliness)}</span>
-      <span>social ${pct(breakdown.guest_frequency)}</span>
-      <span>vibe ${pct(breakdown.personality)}</span>
-    </div>
-    ${renderContactRow(profile)}
-    ${renderIcebreakerButton(profile)}
-    <div class="icebreaker-box hidden" id="icebreaker-${escapeAttr(profile.id)}"></div>
-  `;
+  const avatarStyle = profile.photo_url ? `background-image:url(${escapeAttr(profile.photo_url)});` : `background:${avatarColor(profile.id)};`;
+  info.innerHTML = `<div class="match-header-row"><div class="match-avatar" style="${avatarStyle}">${profile.photo_url ? "" : initials(profile.full_name)}</div><div class="match-name" style="margin-bottom:0;">${escapeHtml(profile.full_name || "Unnamed")}</div>${profile.is_premium ? `<span class="match-priority-tag">⭐ Priority</span>` : ""}</div><p class="muted mt-0" style="margin-bottom:8px;">${escapeHtml(profile.preferred_area || profile.city || "")} · ₹${profile.budget_min || "?"}–₹${profile.budget_max || "?"}</p><p style="margin-bottom:0;">${escapeHtml((profile.bio || "").slice(0, 160))}${profile.bio && profile.bio.length > 160 ? "…" : ""}</p><div class="score-breakdown"><span>sleep ${pct(breakdown.sleep_schedule)}</span><span>clean ${pct(breakdown.cleanliness)}</span><span>social ${pct(breakdown.guest_frequency)}</span><span>vibe ${pct(breakdown.personality)}</span></div>${renderContactRow(profile)}${renderIcebreakerButton(profile)}<div class="icebreaker-box hidden" id="icebreaker-${escapeAttr(profile.id)}"></div>`;
 
-  card.appendChild(dial);
-  card.appendChild(info);
-  card.appendChild(document.createElement("div")); // spacer for grid col 3
-  list.appendChild(card);
-
+  card.appendChild(dial); card.appendChild(info); card.appendChild(document.createElement("div")); list.appendChild(card);
   renderSyncDial(dial, ruleScore, { size: 78, label: "" });
-
-  const icebreakerBtn = info.querySelector("[data-action='icebreaker']");
-  icebreakerBtn?.addEventListener("click", () => handleIcebreakerClick(profile));
+  info.querySelector("[data-action='icebreaker']")?.addEventListener("click", () => handleIcebreakerClick(profile));
 }
 
 function renderIcebreakerButton(profile) {
-  if (!me.is_premium) {
-    return `<button type="button" class="btn-icebreaker locked" data-action="icebreaker" style="margin-top:12px;">🔒 Icebreaker suggestion — Premium</button>`;
-  }
+  if (!me.is_premium) return `<button type="button" class="btn-icebreaker locked" data-action="icebreaker" style="margin-top:12px;">🔒 Icebreaker suggestion — Premium</button>`;
   return `<button type="button" class="btn-icebreaker" data-action="icebreaker" style="margin-top:12px;">✨ Suggest an icebreaker</button>`;
 }
 
 function handleIcebreakerClick(profile) {
-  if (!me.is_premium) {
-    window.location.href = "pricing.html";
-    return;
-  }
-
+  if (!me.is_premium) { window.location.href = "pricing.html"; return; }
   const box = document.getElementById(`icebreaker-${profile.id}`);
   if (!box) return;
-
-  if (!box.classList.contains("hidden")) {
-    box.classList.add("hidden");
-    return;
-  }
-
+  if (!box.classList.contains("hidden")) { box.classList.add("hidden"); return; }
   const text = generateIcebreaker(me, profile);
-  box.innerHTML = `
-    <p>${escapeHtml(text)}</p>
-    <div class="icebreaker-actions">
-      <button type="button" class="btn-icebreaker" data-action="copy">📋 Copy</button>
-      <button type="button" class="btn-icebreaker" data-action="regen">🔁 Another one</button>
-    </div>
-  `;
+  box.innerHTML = `<p>${escapeHtml(text)}</p><div class="icebreaker-actions"><button type="button" class="btn-icebreaker" data-action="copy">📋 Copy</button><button type="button" class="btn-icebreaker" data-action="regen">🔁 Another one</button></div>`;
   box.classList.remove("hidden");
-
-  box.querySelector("[data-action='copy']").addEventListener("click", (e) => {
-    navigator.clipboard?.writeText(text);
-    e.currentTarget.textContent = "Copied ✓";
-    setTimeout(() => (e.currentTarget.textContent = "📋 Copy"), 1500);
-  });
-  box.querySelector("[data-action='regen']").addEventListener("click", () => {
-    box.querySelector("p").textContent = generateIcebreaker(me, profile);
-  });
+  box.querySelector("[data-action='copy']").addEventListener("click", (e) => { navigator.clipboard?.writeText(text); e.currentTarget.textContent = "Copied ✓"; setTimeout(() => (e.currentTarget.textContent = "📋 Copy"), 1500); });
+  box.querySelector("[data-action='regen']").addEventListener("click", () => { box.querySelector("p").textContent = generateIcebreaker(me, profile); });
 }
 
-/**
- * Lightweight, fully local icebreaker generator — a Premium perk that
- * doesn't need an LLM key or network call. Picks a template based on
- * what the two profiles actually have in common (city, budget, top
- * compatibility field) so it doesn't read as generic filler.
- */
 function generateIcebreaker(me, profile) {
   const name = (profile.full_name || "there").split(" ")[0];
   const sameArea = profile.preferred_area && profile.preferred_area === me.preferred_area;
   const sameCleanliness = profile.cleanliness != null && me.cleanliness != null && Math.abs(profile.cleanliness - me.cleanliness) <= 1;
   const sameCooking = profile.cooking_habits && profile.cooking_habits === me.cooking_habits;
-
-  const templates = [
-    `Hey ${name}! We matched pretty high on HomeSync — I'm looking around ${escapeHtml(me.preferred_area || me.city || "the same area")} too, budget's roughly ₹${me.budget_min || "?"}–₹${me.budget_max || "?"}. Open to a quick chat?`,
-    `Hi ${name}, our lifestyle answers lined up well on HomeSync AI. Want to compare notes on the flat-hunt and see if it's worth meeting up?`,
-  ];
+  const templates = [`Hey ${name}! We matched pretty high on HomeSync — I'm looking around ${escapeHtml(me.preferred_area || me.city || "the same area")} too, budget's roughly ₹${me.budget_min || "?"}–₹${me.budget_max || "?"}. Open to a quick chat?`,`Hi ${name}, our lifestyle answers lined up well on HomeSync AI. Want to compare notes on the flat-hunt and see if it's worth meeting up?`];
   if (sameArea) templates.push(`Hey ${name}! Looks like we're both eyeing ${escapeHtml(profile.preferred_area)} — small world. Want to team up on the search?`);
   if (sameCleanliness) templates.push(`Hi ${name}, seems like we're on the same page about tidiness levels, which is honestly the thing that makes or breaks a flatshare. Want to chat?`);
   if (sameCooking) templates.push(`Hey ${name}! We matched well, and looks like our cooking habits line up too — always a good sign for a shared kitchen. Down to talk?`);
-
   return templates[Math.floor(Math.random() * templates.length)];
 }
 
 function renderContactRow(profile) {
   const buttons = [];
-
   if (profile.email) {
     const subject = encodeURIComponent("Hi from HomeSync AI");
-    const body = encodeURIComponent(
-      `Hey ${profile.full_name || ""}, we matched on HomeSync AI — would love to chat about rooming together.`
-    );
-    buttons.push(
-      `<a class="btn-contact" href="mailto:${escapeAttr(profile.email)}?subject=${subject}&body=${body}" target="_blank" rel="noopener">✉️ Email</a>`
-    );
+    const body = encodeURIComponent(`Hey ${profile.full_name || ""}, we matched on HomeSync AI — would love to chat about rooming together.`);
+    buttons.push(`<a class="btn-contact" href="mailto:${escapeAttr(profile.email)}?subject=${subject}&body=${body}" target="_blank" rel="noopener">✉️ Email</a>`);
   }
-
   if (profile.mobile_number) {
     const digits = profile.mobile_number.replace(/\D/g, "");
-    // Assume Indian numbers if no country code was entered (10 digits).
     const waNumber = digits.length === 10 ? "91" + digits : digits;
-    const text = encodeURIComponent(
-      `Hi ${profile.full_name || ""}, we matched on HomeSync AI — would love to chat about rooming together!`
-    );
-    buttons.push(
-      `<a class="btn-contact whatsapp" href="https://wa.me/${waNumber}?text=${text}" target="_blank" rel="noopener">💬 WhatsApp</a>`
-    );
+    const text = encodeURIComponent(`Hi ${profile.full_name || ""}, we matched on HomeSync AI — would love to chat about rooming together!`);
+    buttons.push(`<a class="btn-contact whatsapp" href="https://wa.me/${waNumber}?text=${text}" target="_blank" rel="noopener">💬 WhatsApp</a>`);
   }
-
   if (buttons.length === 0) return "";
   return `<div class="contact-row">${buttons.join("")}</div>`;
 }
 
-function escapeAttr(str) {
-  return String(str || "").replace(/"/g, "&quot;");
-}
-
-function pct(sim) {
-  return Math.round((sim ?? 0) * 100) + "%";
-}
-
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str || "";
-  return div.innerHTML;
-}
+function escapeAttr(str) { return String(str || "").replace(/"/g, "&quot;"); }
+function pct(sim) { return Math.round((sim ?? 0) * 100) + "%"; }
+function escapeHtml(str) { const div = document.createElement("div"); div.textContent = str || ""; return div.innerHTML; }
