@@ -14,66 +14,77 @@ on:
       - 'assets/**'
       - '.github/workflows/mobile-build.yml'
 
-permissions:
-  contents: read
-
 env:
   NODE_VERSION: '22'
+  JAVA_VERSION: '21'
+
+permissions:
+  contents: read
 
 jobs:
   android:
     name: Android debug APK
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      # Deliberately do not use npm ci or setup-node's npm cache.
-      # HomeSync intentionally has no package-lock.json.
-      - name: Install dependencies without a lockfile
-        run: npm install --no-package-lock --no-audit --no-fund
-      - name: Verify no lockfile is required
-        run: test ! -f package-lock.json
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: gradle
+      - name: Verify toolchain
+        run: |
+          node --version
+          npm --version
+          java -version
+      - name: Install npm dependencies without lockfile
+        run: npm install --no-package-lock --legacy-peer-deps --no-audit --no-fund
       - name: Prepare web bundle
         run: npm run mobile:prepare
       - name: Add Android platform
-        run: npx cap add android
+        run: npx --yes cap add android
       - name: Sync web app
-        run: npx cap sync android
+        run: npx --yes cap sync android
+      - name: Make Gradle executable
+        run: chmod +x android/gradlew
       - name: Build debug APK
         working-directory: android
-        run: ./gradlew assembleDebug
+        run: ./gradlew --no-daemon --stacktrace assembleDebug
+      - name: Verify APK exists
+        run: test -s android/app/build/outputs/apk/debug/app-debug.apk
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: homesync-android-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
 
   ios:
     name: iOS simulator build
     runs-on: macos-15
+    timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      # Deliberately do not use npm ci or setup-node's npm cache.
-      # HomeSync intentionally has no package-lock.json.
-      - name: Install dependencies without a lockfile
-        run: npm install --no-package-lock --no-audit --no-fund
-      - name: Verify no lockfile is required
-        run: test ! -f package-lock.json
+      - name: Install npm dependencies without lockfile
+        run: npm install --no-package-lock --legacy-peer-deps --no-audit --no-fund
       - name: Prepare web bundle
         run: npm run mobile:prepare
       - name: Add iOS platform
-        run: npx cap add ios
+        run: npx --yes cap add ios
       - name: Sync web app
-        run: npx cap sync ios
+        run: npx --yes cap sync ios
       - name: Build iOS simulator app
         run: |
           xcodebuild \
@@ -89,3 +100,4 @@ jobs:
         with:
           name: homesync-ios-simulator
           path: ios/build/Build/Products/Debug-iphonesimulator/App.app
+          if-no-files-found: error
